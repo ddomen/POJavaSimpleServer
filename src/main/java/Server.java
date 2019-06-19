@@ -1,7 +1,9 @@
 import DTO.DataSetDTO;
 import DTO.DataSetMetadataDTO;
 
+import javax.swing.*;
 import java.io.*;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
@@ -53,7 +55,7 @@ public class Server {
         public void run() {
             while(true){
                 Connection connect = null;
-                try{ connect = new Connection(this.socket.accept(), this.dataset); }
+                try{ connect = new Connection(this.socket.accept(), this.metadata, this.dataset); }
                 catch (Exception ex){ System.err.println("Connessione rifiutata!"); }
 
                 if(connect != null){
@@ -70,9 +72,11 @@ public class Server {
         protected PrintWriter output;
         protected BufferedOutputStream dataOutput;
         protected List<DataSetDTO> dataset;
+        protected DataSetMetadataDTO metadata;
 
-        public Connection(Socket connect, List<DataSetDTO> dataset){
+        public Connection(Socket connect, DataSetMetadataDTO metadata, List<DataSetDTO> dataset){
             this.connect = connect;
+            this.metadata = metadata;
             this.dataset = dataset;
         }
 
@@ -85,9 +89,11 @@ public class Server {
                 String input = this.input.readLine();
                 StringTokenizer parse = new StringTokenizer(input);
                 String method = parse.nextToken().toUpperCase();
-                String url = parse.nextToken().toLowerCase();
+                String url = parse.nextToken().toLowerCase().substring(1);
 
-                Response("OK", 200);
+                Controller cnt = new Controller(method, url);
+
+                Response(cnt.Execute(this.metadata, this.dataset));
 
                 System.out.println("URL: " + url);
             }
@@ -109,21 +115,68 @@ public class Server {
         protected HashMap<Integer, String> StatusCodes = new HashMap<Integer, String>(){
             {
                 put(200, "OK");
+                put(404, "NOT FOUND");
+                put(500, "INTERNAL SERVER ERROR");
             }
         };
 
-        protected Connection Response(String response, int status) throws IOException{
-            this.output.println("HTTP/1.1 " + status + " " + StatusCodes.get(status));
+        protected Connection Response(ActionResponse response) throws IOException{
+            this.output.println("HTTP/1.1 " + response.status + " " + StatusCodes.get(response.status));
             this.output.println("Server: Java HTTP Server");
             this.output.println("Date: " + new Date());
             this.output.println("Content-type: application/json" );
-            this.output.println("Content-length: " + response.length());
+            this.output.println("Content-length: " + response.length);
             this.output.println();
             this.output.flush();
 
-            this.dataOutput.write(response.getBytes(), 0, response.length());
+            this.dataOutput.write(response.result.getBytes(), 0, response.length);
             this.dataOutput.flush();
             return this;
         }
+    }
+
+    protected class ActionResponse{
+        public String result;
+        public int status;
+        public int length;
+        public ActionResponse(String result, int status){
+            this.result = result;
+            this.status = status;
+            this.length = this.result.length();
+        }
+        public ActionResponse(String result){
+            this.result = result;
+            this.status = 200;
+            this.length = this.result.length();
+        }
+    }
+
+    protected class Controller{
+        protected String url;
+        protected String method;
+        protected ActionResponse response;
+        public Controller(String method, String url){
+            this.method = method;
+            this.url = url;
+        }
+
+        public ActionResponse Execute(DataSetMetadataDTO metadata, List<DataSetDTO> dataset){
+            Method action = null;
+            Class[] arguments = new Class[2];
+            arguments[0] = DataSetMetadataDTO.class;
+            arguments[1] = List.class;
+            try{ action = this.getClass().getMethod(method.toLowerCase() + url.substring(0, 1).toUpperCase() + url.substring(1).toLowerCase(), arguments); }
+            catch(Exception ex){
+                try { action = this.getClass().getMethod("NotFound", arguments); }
+                catch(Exception ex2){ System.err.println("Impossibile instanziare Action"); }
+            }
+            try { this.response = (ActionResponse)action.invoke(this, metadata, dataset); }
+            catch (Exception ex){ this.response = new ActionResponse("Server Error", 500); }
+            return this.response;
+        }
+
+        public ActionResponse NotFound(DataSetMetadataDTO metadata, List<DataSetDTO> dataset){ return new ActionResponse("Not Found", 404); }
+
+        public ActionResponse getMetadata(DataSetMetadataDTO metadata, List<DataSetDTO> dataset){ return new ActionResponse("METADATA :D"); }
     }
 }
