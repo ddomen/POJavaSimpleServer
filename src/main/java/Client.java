@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import javax.net.ssl.HttpsURLConnection;
 
 import DTO.DTO;
+import com.google.gson.Gson;
+import org.apache.commons.lang3.*;
 
 public class Client {
 
@@ -44,12 +46,14 @@ public class Client {
             StringBuffer content = new StringBuffer();
             while((inputLine = inputBuffer.readLine()) != null){ content.append(inputLine); }
             inputBuffer.close();
-            response = content.toString();
+            response = parseUnicode(content.toString());
         }
         else{ throw new Exception("StatusCode: " + status); }
         connection.disconnect();
         return response;
     }
+
+    protected String parseUnicode(String string){ return StringEscapeUtils.unescapeJava(string).replace("\n", ""); }
 
     protected String utf8Encode(String str) throws UnsupportedEncodingException{ return URLEncoder.encode(str, "UTF-8"); }
 
@@ -67,10 +71,11 @@ public class Client {
         return dto;
     }
 
-//    public <ReturnType extends DTO> ReturnType Update() throws Exception{
-//        String result = this.Get(this.baseUrl);
-//
-//    }
+    public <ReturnType extends DTO> ReturnType Update(Class<ReturnType> _class) throws Exception{
+        String requestResult = this.Get(this.baseUrl);
+        ReturnType result = new Gson().fromJson(requestResult, _class);
+        return result;
+    }
 
     public String Update() throws IOException, Exception{ return this.Get(this.baseUrl); }
 }
