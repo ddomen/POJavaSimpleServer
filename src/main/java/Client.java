@@ -1,10 +1,10 @@
-import DTO.DTO;
-
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.lang.reflect.InvocationTargetException;
 import javax.net.ssl.HttpsURLConnection;
+
+import DTO.DTO;
 
 public class Client {
 
