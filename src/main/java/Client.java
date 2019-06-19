@@ -1,12 +1,13 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.lang.reflect.InvocationTargetException;
 import javax.net.ssl.HttpsURLConnection;
 
-import DTO.DTO;
+import Utils.UCsv;
+import Utils.UString;
 import com.google.gson.Gson;
-import org.apache.commons.lang3.*;
+
+import DTO.*;
 
 public class Client {
 
@@ -36,6 +37,7 @@ public class Client {
 
         //Simulazione di un browser
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
+        connection.setRequestProperty("Accept-Charset", "UTF-8");
         if(headers != null){ for(Map.Entry<String, String> entry : params.entrySet()){ connection.setRequestProperty(entry.getKey(), entry.getValue()); } }
 
         int status = connection.getResponseCode();
@@ -44,38 +46,42 @@ public class Client {
             BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
             StringBuffer content = new StringBuffer();
-            while((inputLine = inputBuffer.readLine()) != null){ content.append(inputLine); }
+            while((inputLine = inputBuffer.readLine()) != null){ content.append(inputLine + "\n"); }
             inputBuffer.close();
-            response = parseUnicode(content.toString());
+            response = UString.Escape(content.toString());
         }
         else{ throw new Exception("StatusCode: " + status); }
         connection.disconnect();
         return response;
     }
 
-    protected String parseUnicode(String string){ return StringEscapeUtils.unescapeJava(string).replace("\n", ""); }
-
-    protected String utf8Encode(String str) throws UnsupportedEncodingException{ return URLEncoder.encode(str, "UTF-8"); }
-
     protected String getParamsString(Map<String, String> params) throws UnsupportedEncodingException {
         String result = "";
-        for(Map.Entry<String, String> entry  : params.entrySet()){ result += utf8Encode(entry.getKey()) + "=" + utf8Encode(entry.getValue()) + "&"; }
+        for(Map.Entry<String, String> entry  : params.entrySet()){ result += UString.Utf8Encode(entry.getKey()) + "=" + UString.Utf8Encode(entry.getValue()) + "&"; }
         int length = result.length();
         return  length > 0 ? result.substring(0, length - 1) : result;
     }
 
-    protected <ReturnType extends DTO> ReturnType Convert(Map<String, Object> object, Class<ReturnType> dtoClass)
-            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
-        ReturnType dto = dtoClass.getDeclaredConstructor(int.class).newInstance();
-        for(Map.Entry<String, Object> entry : object.entrySet()){ dto.Set(entry.getKey(), entry.getValue()); }
-        return dto;
+    protected DataSetMetadataDTO CollectMetadata() throws Exception{
+        String requestResult = this.Get(this.baseUrl).replace("\n", "");
+        return new Gson().fromJson(requestResult, DataSetMetadataDTO.class);
     }
 
-    public <ReturnType extends DTO> ReturnType Update(Class<ReturnType> _class) throws Exception{
-        String requestResult = this.Get(this.baseUrl);
-        ReturnType result = new Gson().fromJson(requestResult, _class);
-        return result;
+    protected List<DataSetDTO> CollectData(DataSetMetadataDTO metadata) throws Exception{
+        DataSetMetadataDTO.Result.Resource source = null;
+        for(DataSetMetadataDTO.Result.Resource resource: metadata.result.resources){
+            if(resource.format.equalsIgnoreCase("csv")){
+                source = resource;
+                break;
+            }
+        }
+        if(source == null){ throw new Exception("Impossible to find csv resurce"); }
+
+        String requestResult = this.Get(source.url);
+        return UCsv.Parse(requestResult, DataSetDTO.class);
     }
 
-    public String Update() throws IOException, Exception{ return this.Get(this.baseUrl); }
+//    public String Update() throws IOException, Exception{ return this.Get(this.baseUrl); }
+
+    public List<DataSetDTO> Update() throws  Exception{ return this.CollectData(this.CollectMetadata()); }
 }
