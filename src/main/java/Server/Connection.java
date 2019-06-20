@@ -2,6 +2,7 @@ package Server;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.util.*;
 
 import Dto.*;
@@ -51,7 +52,7 @@ public class Connection implements Runnable{
             String[] pair = param.split("\\=");
             String key = pair[0];
             String value = "";
-            if(pair.length > 1){ value = pair[1]; }
+            if(pair.length > 1){ value = URLDecoder.decode(pair[1]); }
             result.put(key, value);
         }
         return result;

@@ -1,39 +1,50 @@
 package Dto;
 
+import Utils.UObject;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DtoDataFilter extends Dto{
-    public Long ID;
-    public Long CODICE_ASL;
-    public String ASL;
-    public String DISTRETTO;
-    public String RAPPORTO_SSR;
-    public String DENOMINAZIONE_GESTORE;
-    public String DENOMINAZIONE_STRUTTURA_OPERATIVA;
-    public String P_IVA;
-    public String INDIRIZZO_SEDE_OPERATIVA;
-    public Long CODICE_ISTAT_COMUNE;
-    public String COMUNE_SEDE_OPERATIVA;
-    public String PROVINCIA;
-    public String ATTIVITA;
-    public Integer PL_RES;
-    public Integer PL_SEMIRES;
-    public Integer PL_RES_ECCESSO_DA_ART_26;
-    public Integer PL_SEMIRES_ECCESSO_DA_ART_26;
-    public Integer RES_ART_26;
-    public Integer P_L_RES_ECCESSO;
-    public Integer SEMIRES_ART_26;
-    public Integer P_L_SEMIRES_ECCESSO;
-    public Integer RSA_DISABILI;
-    public Integer CD_DISABILI;
-    public Integer RSA_ANZIANI;
-    public Integer RSA_DEMENZE;
-    public Integer CD_ANZIANI;
-    public Integer CD_DEMENZE;
-
+    public DtoDataFilterOperator id;
+    public DtoDataFilterOperator codice_asl;
+    public DtoDataFilterOperator asl;
+    public DtoDataFilterOperator distretto;
+    public DtoDataFilterOperator rapporto_ssr;
+    public DtoDataFilterOperator denominazione_gestore;
+    public DtoDataFilterOperator denominazione_struttura_operativa;
+    public DtoDataFilterOperator p_iva;
+    public DtoDataFilterOperator indirizzo_sede_operativa;
+    public DtoDataFilterOperator codice_istat_comune;
+    public DtoDataFilterOperator comune_sede_operativa;
+    public DtoDataFilterOperator provincia;
+    public DtoDataFilterOperator attivita;
+    public DtoDataFilterOperator pl_res;
+    public DtoDataFilterOperator pl_semires;
+    public DtoDataFilterOperator pl_res_eccesso_da_art_26;
+    public DtoDataFilterOperator pl_semires_eccesso_da_art_26;
+    public DtoDataFilterOperator res_art_26;
+    public DtoDataFilterOperator p_l_res_eccesso;
+    public DtoDataFilterOperator semires_art_26;
+    public DtoDataFilterOperator p_l_semires_eccesso;
+    public DtoDataFilterOperator rsa_disabili;
+    public DtoDataFilterOperator cd_disabili;
+    public DtoDataFilterOperator rsa_anziani;
+    public DtoDataFilterOperator rsa_demenze;
+    public DtoDataFilterOperator cd_anziani;
+    public DtoDataFilterOperator cd_demenze;
 
     public List<DtoDataSet> Apply(List<DtoDataSet> dataset){
-        return null;
+        List<DtoDataSet> result = new ArrayList<DtoDataSet>();
+        result.addAll(dataset);
+        Field[] fields = this.getClass().getFields();
+        for(Field field : fields){
+            String property = field.getName();
+            DtoDataFilterOperator operator = (DtoDataFilterOperator)UObject.Get(this, property);
+            if(operator != null){ result =  operator.Apply(result, property); }
+        }
+        return result;
     }
 
 }

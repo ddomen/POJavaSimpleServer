@@ -53,7 +53,8 @@ public class Controller {
     public ActionResponse getData(DtoPackage dtoPackage, List<DtoDataSet> dataset){
         List<DtoDataSet> result = dataset;
         if(parameters.containsKey("filter")){
-            DtoDataFilter filter = UObject.fromJSON(parameters.get("filter"), DtoDataFilter.class);
+            String filterJson = parameters.get("filter").toLowerCase();
+            DtoDataFilter filter = UObject.fromJSON(filterJson, DtoDataFilter.class);
             if(filter == null){ return ActionResponse.BadRequest; }
             result = filter.Apply(result);
         }
