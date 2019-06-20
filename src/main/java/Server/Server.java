@@ -1,17 +1,9 @@
 package Server;
 
 import Dto.DtoDataSet;
-import Dto.DtoMetadata;
-import Utils.UObject;
+import Dto.DtoPackage;
 
-import java.io.*;
-import java.lang.reflect.Method;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class Server {
     protected final int port;
@@ -43,5 +35,5 @@ public class Server {
     }
 
     public Server SetData(List<DtoDataSet> dataset){ this.runner.SetData(dataset); return this; }
-    public Server SetMetadata(DtoMetadata metadata){ this.runner.SetMetadata(metadata); return this; }
+    public Server SetMetadata(DtoPackage metadata){ this.runner.SetMetadata(metadata); return this; }
 }

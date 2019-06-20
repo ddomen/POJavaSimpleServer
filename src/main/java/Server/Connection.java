@@ -16,9 +16,9 @@ public class Connection implements Runnable{
     protected PrintWriter output;
     protected BufferedOutputStream dataOutput;
     protected List<DtoDataSet> dataset;
-    protected DtoMetadata metadata;
+    protected DtoPackage metadata;
 
-    public Connection(Socket connect, DtoMetadata metadata, List<DtoDataSet> dataset){
+    public Connection(Socket connect, DtoPackage metadata, List<DtoDataSet> dataset){
         this.connect = connect;
         this.metadata = metadata;
         this.dataset = dataset;

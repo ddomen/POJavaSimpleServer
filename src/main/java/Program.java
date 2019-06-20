@@ -10,7 +10,7 @@ public class Program {
         System.out.println("SERVER - CREAZIONE");
         Server svr = new Server();
 
-        DtoMetadata metadata = null;
+        DtoPackage metadata = null;
         List<DtoDataSet> dataset = null;
         try {
             System.out.println("DATASET - RECUPERO");

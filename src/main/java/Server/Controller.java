@@ -1,11 +1,12 @@
 package Server;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import Dto.*;
-
-import javax.swing.*;
+import Utils.UObject;
 
 public class Controller {
     protected String url;
@@ -16,10 +17,11 @@ public class Controller {
         this.url = url;
     }
 
-    public ActionResponse Execute(DtoMetadata metadata, List<DtoDataSet> dataset){
+    public ActionResponse Execute(DtoPackage metadata, List<DtoDataSet> dataset){
+        if(metadata == null || dataset == null){ return new ActionResponse("Servizio Non Ancora Disponibile", 503); }
         Method action = null;
         Class[] arguments = new Class[2];
-        arguments[0] = DtoMetadata.class;
+        arguments[0] = DtoPackage.class;
         arguments[1] = List.class;
         try{ action = this.getClass().getMethod(method.toLowerCase() + url.substring(0, 1).toUpperCase() + url.substring(1).toLowerCase(), arguments); }
         catch(Exception ex){
@@ -31,12 +33,19 @@ public class Controller {
         return this.response;
     }
 
-    public ActionResponse NotFound(DtoMetadata metadata, List<DtoDataSet> dataset){ return new ActionResponse("Not Found", 404); }
+    public ActionResponse NotFound(DtoPackage metadata, List<DtoDataSet> dataset){ return new ActionResponse("Not Found", 404); }
 
-    public ActionResponse getMetadata(DtoMetadata metadata, List<DtoDataSet> dataset){
-        if(metadata == null){
-            return new ActionResponse("Servizio Non Ancora Disponibile", 503);
+    public ActionResponse getFullmetadata(DtoPackage metadata, List<DtoDataSet> dataset){ return new ActionResponse(metadata); }
+
+    public ActionResponse getMetadata(DtoPackage metadata, List<DtoDataSet> dataset){
+        List<Object> fields = new ArrayList<Object>();
+        for(Field field : DtoDataSet.class.getFields()){
+            Object current = new Object();
+            UObject.Set(current, "alias", field.getName());
+            UObject.Set(current, "sourceField", field.getName());
+            UObject.Set(current, "type", field.getType());
+            fields.add(current);
         }
-        return new ActionResponse(metadata);
+        return new ActionResponse(fields);
     }
 }
