@@ -10,21 +10,21 @@ public class Program {
         System.out.println("SERVER - CREAZIONE");
         Server svr = new Server();
 
-        DtoPackage metadata = null;
+        DtoPackage dtoPackage = null;
         List<DtoDataSet> dataset = null;
         try {
             System.out.println("DATASET - RECUPERO");
-            metadata = cli.CollectMetadata();
-            dataset = cli.CollectData(metadata);
+            dtoPackage = cli.CollectPackage();
+            dataset = cli.CollectData(dtoPackage);
             System.out.println("DATASET - RECUPERATO");
         }
         catch(Exception ex){
             System.out.println("Qualcosa è andato storto!");
             ex.printStackTrace();
         }
-        if(metadata != null){
-            svr.SetMetadata(metadata);
-            System.out.println("SERVER - METADATA PRONTO");
+        if(dtoPackage != null){
+            svr.SetPackage(dtoPackage);
+            System.out.println("SERVER - PACKAGE PRONTO");
         }
         if(dataset != null){
             svr.SetData(dataset);

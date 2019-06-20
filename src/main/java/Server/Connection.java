@@ -16,11 +16,11 @@ public class Connection implements Runnable{
     protected PrintWriter output;
     protected BufferedOutputStream dataOutput;
     protected List<DtoDataSet> dataset;
-    protected DtoPackage metadata;
+    protected DtoPackage dtoPackage;
 
-    public Connection(Socket connect, DtoPackage metadata, List<DtoDataSet> dataset){
+    public Connection(Socket connect, DtoPackage dtoPackage, List<DtoDataSet> dataset){
         this.connect = connect;
-        this.metadata = metadata;
+        this.dtoPackage = dtoPackage;
         this.dataset = dataset;
     }
 
@@ -37,7 +37,7 @@ public class Connection implements Runnable{
 
             Controller cnt = new Controller(method, url);
 
-            Response(cnt.Execute(this.metadata, this.dataset));
+            Response(cnt.Execute(this.dtoPackage, this.dataset));
         }
         catch (Exception ex){ System.err.println("Impossibile stabilire la connessione");  }
         finally { this.CloseBuffers(); }

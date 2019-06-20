@@ -8,6 +8,8 @@ import java.util.List;
 import Dto.*;
 import Utils.UObject;
 
+import javax.swing.*;
+
 public class Controller {
     protected String url;
     protected String method;
@@ -17,8 +19,8 @@ public class Controller {
         this.url = url;
     }
 
-    public ActionResponse Execute(DtoPackage metadata, List<DtoDataSet> dataset){
-        if(metadata == null || dataset == null){ return new ActionResponse("Servizio Non Ancora Disponibile", 503); }
+    public ActionResponse Execute(DtoPackage dtoPackage, List<DtoDataSet> dataset){
+        if(dtoPackage == null || dataset == null){ return new ActionResponse("Servizio Non Ancora Disponibile", 503); }
         Method action = null;
         Class[] arguments = new Class[2];
         arguments[0] = DtoPackage.class;
@@ -28,16 +30,16 @@ public class Controller {
             try { action = this.getClass().getMethod("NotFound", arguments); }
             catch(Exception ex2){ System.err.println("Impossibile instanziare Action"); }
         }
-        try { this.response = (ActionResponse)action.invoke(this, metadata, dataset); }
+        try { this.response = (ActionResponse)action.invoke(this, dtoPackage, dataset); }
         catch (Exception ex){ this.response = new ActionResponse("Server Error", 500); }
         return this.response;
     }
 
-    public ActionResponse NotFound(DtoPackage metadata, List<DtoDataSet> dataset){ return new ActionResponse("Not Found", 404); }
+    public ActionResponse NotFound(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return new ActionResponse("Not Found", 404); }
 
-    public ActionResponse getFullmetadata(DtoPackage metadata, List<DtoDataSet> dataset){ return new ActionResponse(metadata); }
+    public ActionResponse getPackage(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return new ActionResponse(dtoPackage); }
 
-    public ActionResponse getMetadata(DtoPackage metadata, List<DtoDataSet> dataset){
+    public ActionResponse getMetadata(DtoPackage dtoPackage, List<DtoDataSet> dataset){
         List<DtoMetadata> fields = new ArrayList<DtoMetadata>();
         for(Field field : DtoDataSet.class.getFields()){
             DtoMetadata current = new DtoMetadata();
@@ -48,4 +50,6 @@ public class Controller {
         }
         return new ActionResponse(fields);
     }
+
+    public ActionResponse getData(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return new ActionResponse(dataset); }
 }

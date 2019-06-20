@@ -62,14 +62,14 @@ public class Client {
         return  length > 0 ? result.substring(0, length - 1) : result;
     }
 
-    public DtoPackage CollectMetadata() throws Exception{
+    public DtoPackage CollectPackage() throws Exception{
         String requestResult = this.Get(this.baseUrl).replace("\n", "");
         return new Gson().fromJson(requestResult, DtoPackage.class);
     }
 
-    public List<DtoDataSet> CollectData(DtoPackage metadata) throws Exception{
+    public List<DtoDataSet> CollectData(DtoPackage dtoPackage) throws Exception{
         DtoPackageResource source = null;
-        for(DtoPackageResource resource: metadata.result.resources){
+        for(DtoPackageResource resource: dtoPackage.result.resources){
             if(resource.format.equalsIgnoreCase("csv")){
                 source = resource;
                 break;

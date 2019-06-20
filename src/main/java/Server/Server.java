@@ -35,5 +35,5 @@ public class Server {
     }
 
     public Server SetData(List<DtoDataSet> dataset){ this.runner.SetData(dataset); return this; }
-    public Server SetMetadata(DtoPackage metadata){ this.runner.SetMetadata(metadata); return this; }
+    public Server SetPackage(DtoPackage dtoPackage){ this.runner.SetPackage(dtoPackage); return this; }
 }
