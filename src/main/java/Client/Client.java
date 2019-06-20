@@ -1,10 +1,13 @@
+package Client;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.lang.reflect.InvocationTargetException;
 import javax.net.ssl.HttpsURLConnection;
+import com.google.gson.Gson;
 
-import DTO.DTO;
+import Dto.*;
+import Utils.*;
 
 public class Client {
 
@@ -34,6 +37,7 @@ public class Client {
 
         //Simulazione di un browser
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
+        connection.setRequestProperty("Accept-Charset", "UTF-8");
         if(headers != null){ for(Map.Entry<String, String> entry : params.entrySet()){ connection.setRequestProperty(entry.getKey(), entry.getValue()); } }
 
         int status = connection.getResponseCode();
@@ -42,35 +46,38 @@ public class Client {
             BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
             StringBuffer content = new StringBuffer();
-            while((inputLine = inputBuffer.readLine()) != null){ content.append(inputLine); }
+            while((inputLine = inputBuffer.readLine()) != null){ content.append(inputLine + "\n"); }
             inputBuffer.close();
-            response = content.toString();
+            response = UString.Escape(content.toString());
         }
         else{ throw new Exception("StatusCode: " + status); }
         connection.disconnect();
         return response;
     }
 
-    protected String utf8Encode(String str) throws UnsupportedEncodingException{ return URLEncoder.encode(str, "UTF-8"); }
-
     protected String getParamsString(Map<String, String> params) throws UnsupportedEncodingException {
         String result = "";
-        for(Map.Entry<String, String> entry  : params.entrySet()){ result += utf8Encode(entry.getKey()) + "=" + utf8Encode(entry.getValue()) + "&"; }
+        for(Map.Entry<String, String> entry  : params.entrySet()){ result += UString.Utf8Encode(entry.getKey()) + "=" + UString.Utf8Encode(entry.getValue()) + "&"; }
         int length = result.length();
         return  length > 0 ? result.substring(0, length - 1) : result;
     }
 
-    protected <ReturnType extends DTO> ReturnType Convert(Map<String, Object> object, Class<ReturnType> dtoClass)
-            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
-        ReturnType dto = dtoClass.getDeclaredConstructor(int.class).newInstance();
-        for(Map.Entry<String, Object> entry : object.entrySet()){ dto.Set(entry.getKey(), entry.getValue()); }
-        return dto;
+    public DtoMetadata CollectMetadata() throws Exception{
+        String requestResult = this.Get(this.baseUrl).replace("\n", "");
+        return new Gson().fromJson(requestResult, DtoMetadata.class);
     }
 
-//    public <ReturnType extends DTO> ReturnType Update() throws Exception{
-//        String result = this.Get(this.baseUrl);
-//
-//    }
+    public List<DtoDataSet> CollectData(DtoMetadata metadata) throws Exception{
+        DtoMetadataResource source = null;
+        for(DtoMetadataResource resource: metadata.result.resources){
+            if(resource.format.equalsIgnoreCase("csv")){
+                source = resource;
+                break;
+            }
+        }
+        if(source == null){ throw new Exception("Impossible to find csv resurce"); }
 
-    public String Update() throws IOException, Exception{ return this.Get(this.baseUrl); }
+        String requestResult = this.Get(source.url);
+        return UCsv.Parse(requestResult, DtoDataSet.class);
+    }
 }
