@@ -1,5 +1,7 @@
 package Utils;
 
+import com.google.gson.Gson;
+
 import java.lang.reflect.Field;
 
 public class UObject {
@@ -47,4 +49,6 @@ public class UObject {
         else if(Double.class == _class) return Double.parseDouble(value);
         return null;
     }
+
+    public static String JSON(Object object){ return new Gson().toJson(object); }
 }

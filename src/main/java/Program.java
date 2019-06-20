@@ -1,4 +1,6 @@
-import DTO.*;
+import Client.*;
+import Dto.*;
+import Server.*;
 
 import java.util.List;
 
@@ -8,8 +10,8 @@ public class Program {
         System.out.println("SERVER - CREAZIONE");
         Server svr = new Server();
 
-        DataSetMetadataDTO metadata = null;
-        List<DataSetDTO> dataset = null;
+        DtoMetadata metadata = null;
+        List<DtoDataSet> dataset = null;
         try {
             System.out.println("DATASET - RECUPERO");
             metadata = cli.CollectMetadata();
