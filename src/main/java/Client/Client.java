@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import javax.net.ssl.HttpsURLConnection;
-import com.google.gson.Gson;
 
 import Dto.*;
 import Utils.*;
@@ -64,7 +63,7 @@ public class Client {
 
     public DtoPackage CollectPackage() throws Exception{
         String requestResult = this.Get(this.baseUrl).replace("\n", "");
-        return new Gson().fromJson(requestResult, DtoPackage.class);
+        return UObject.fromJSON(requestResult, DtoPackage.class);
     }
 
     public List<DtoDataSet> CollectData(DtoPackage dtoPackage) throws Exception{

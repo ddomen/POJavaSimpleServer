@@ -4,6 +4,7 @@ import java.util.*;
 import java.lang.reflect.*;
 
 import Dto.*;
+import Utils.UObject;
 
 public class Controller {
     protected String url;
@@ -41,13 +42,20 @@ public class Controller {
         List<DtoMetadata> fields = new ArrayList<DtoMetadata>();
         for(Field field : DtoDataSet.class.getFields()){
             DtoMetadata current = new DtoMetadata();
-            current.alias = field.getName();
-            current.sourceField = current.alias;
+            current.sourceField = field.getName();
+            current.alias = current.sourceField.toLowerCase();
             current.type = field.getType().getName().toLowerCase().replace("java.lang.", "");
             fields.add(current);
         }
         return new ActionResponse(fields);
     }
 
-    public ActionResponse getData(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return new ActionResponse(dataset); }
+    public ActionResponse getData(DtoPackage dtoPackage, List<DtoDataSet> dataset){
+        List<DtoDataSet> result = dataset;
+        if(parameters.containsKey("filter")){
+            DtoDataFilter filter = UObject.fromJSON(parameters.get("filter"), DtoDataFilter.class);
+            result = filter.Apply(result);
+        }
+        return new ActionResponse(result);
+    }
 }

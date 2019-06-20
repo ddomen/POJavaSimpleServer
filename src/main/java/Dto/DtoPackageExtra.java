@@ -1,6 +1,6 @@
 package Dto;
 
-public class DtoPackageExtra {
+public class DtoPackageExtra extends Dto {
     public String key;
     public String value;
 }

@@ -2,7 +2,7 @@ package Dto;
 
 import java.util.Date;
 
-public class DtoPackageOrganization{
+public class DtoPackageOrganization extends Dto{
     public Date created;
     public String description;
     public String id;

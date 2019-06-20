@@ -50,5 +50,18 @@ public class UObject {
         return null;
     }
 
-    public static String JSON(Object object){ return new Gson().toJson(object); }
+    public static String toJSON(Object object){ return new Gson().toJson(object); }
+
+    public static <Result> Result fromJSON(String json, Class<Result> _class) {
+        try{ return (Result)new Gson().fromJson(json, _class); }
+        catch (Exception ex){ return null; }
+    }
+
+    public static <Result> Result fromJSON(String json, Class<Result> _class, boolean throwException) throws Exception{
+        try{ return (Result)new Gson().fromJson(json, _class); }
+        catch (Exception ex){
+            if(throwException){ throw ex; }
+            else{ return null; }
+        }
+    }
 }

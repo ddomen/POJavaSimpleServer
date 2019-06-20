@@ -1,6 +1,6 @@
 package Dto;
 
-public class DtoPackageResource {
+public class DtoPackageResource extends Dto{
     public String created;
     public String description;
     public String format;

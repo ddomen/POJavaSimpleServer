@@ -17,12 +17,12 @@ public class ActionResponse {
         this.length = this.result.length();
     }
     public ActionResponse(Object result, int status){
-        this.result = UObject.JSON(result);
+        this.result = UObject.toJSON(result);
         this.status = status;
         this.length = this.result.length();
     }
     public ActionResponse(Object result){
-        this.result = UObject.JSON(result);
+        this.result = UObject.toJSON(result);
         this.status = 200;
         this.length = this.result.length();
     }
