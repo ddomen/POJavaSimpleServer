@@ -1,22 +1,20 @@
 package Server;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.lang.reflect.*;
 
 import Dto.*;
-import Utils.UObject;
-
-import javax.swing.*;
 
 public class Controller {
     protected String url;
     protected String method;
+    protected Map<String, String> parameters;
     protected ActionResponse response;
-    public Controller(String method, String url){
+
+    public Controller(String method, String url, Map<String, String> parameters){
         this.method = method;
         this.url = url;
+        this.parameters = parameters;
     }
 
     public ActionResponse Execute(DtoPackage dtoPackage, List<DtoDataSet> dataset){

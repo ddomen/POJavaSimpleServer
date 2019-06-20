@@ -2,10 +2,7 @@ package Server;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import Dto.*;
 
@@ -33,14 +30,31 @@ public class Connection implements Runnable{
             String input = this.input.readLine();
             StringTokenizer parse = new StringTokenizer(input);
             String method = parse.nextToken().toUpperCase();
-            String url = parse.nextToken().toLowerCase().substring(1);
+            String[] uri = parse.nextToken().toLowerCase().substring(1).split("\\?");
+            String url = uri[0];
+            String params = "";
+            if(uri.length > 1){ params = uri[1]; }
 
-            Controller cnt = new Controller(method, url);
+            Controller cnt = new Controller(method, url, ParseParameters(params));
 
             Response(cnt.Execute(this.dtoPackage, this.dataset));
         }
         catch (Exception ex){ System.err.println("Impossibile stabilire la connessione");  }
         finally { this.CloseBuffers(); }
+    }
+
+    protected Map<String, String> ParseParameters(String parameters){
+        Map<String, String> result = new HashMap<String, String>();
+        if(parameters.length() == 0){ return result; }
+        String[] params = parameters.split("\\&");
+        for(String param : params){
+            String[] pair = param.split("\\=");
+            String key = pair[0];
+            String value = "";
+            if(pair.length > 1){ value = pair[1]; }
+            result.put(key, value);
+        }
+        return result;
     }
 
     protected Connection CloseBuffers(){
