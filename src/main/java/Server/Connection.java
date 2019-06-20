@@ -70,10 +70,11 @@ public class Connection implements Runnable{
 
     protected HashMap<Integer, String> StatusCodes = new HashMap<Integer, String>(){
         {
-            put(200, "OK");
-            put(404, "NOT FOUND");
-            put(500, "INTERNAL SERVER ERROR");
-            put(503, "SERVICE UNAVAILABLE");
+            put(200, "Ok");
+            put(400, "Bad Request");
+            put(404, "Not Found");
+            put(500, "Internal Server Error");
+            put(503, "Service Unavailable");
         }
     };
 

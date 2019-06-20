@@ -19,7 +19,7 @@ public class Controller {
     }
 
     public ActionResponse Execute(DtoPackage dtoPackage, List<DtoDataSet> dataset){
-        if(dtoPackage == null || dataset == null){ return new ActionResponse("Servizio Non Ancora Disponibile", 503); }
+        if(dtoPackage == null || dataset == null){ return ActionResponse.ServiceUnavailable; }
         Method action = null;
         Class[] arguments = new Class[2];
         arguments[0] = DtoPackage.class;
@@ -30,11 +30,11 @@ public class Controller {
             catch(Exception ex2){ System.err.println("Impossibile instanziare Action"); }
         }
         try { this.response = (ActionResponse)action.invoke(this, dtoPackage, dataset); }
-        catch (Exception ex){ this.response = new ActionResponse("Server Error", 500); }
+        catch (Exception ex){ this.response = ActionResponse.InternalServerError; }
         return this.response;
     }
 
-    public ActionResponse NotFound(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return new ActionResponse("Not Found", 404); }
+    public ActionResponse NotFound(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return ActionResponse.NotFound; }
 
     public ActionResponse getPackage(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return new ActionResponse(dtoPackage); }
 
@@ -54,6 +54,7 @@ public class Controller {
         List<DtoDataSet> result = dataset;
         if(parameters.containsKey("filter")){
             DtoDataFilter filter = UObject.fromJSON(parameters.get("filter"), DtoDataFilter.class);
+            if(filter == null){ return ActionResponse.BadRequest; }
             result = filter.Apply(result);
         }
         return new ActionResponse(result);
