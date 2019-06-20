@@ -38,12 +38,12 @@ public class Controller {
     public ActionResponse getFullmetadata(DtoPackage metadata, List<DtoDataSet> dataset){ return new ActionResponse(metadata); }
 
     public ActionResponse getMetadata(DtoPackage metadata, List<DtoDataSet> dataset){
-        List<Object> fields = new ArrayList<Object>();
+        List<DtoMetadata> fields = new ArrayList<DtoMetadata>();
         for(Field field : DtoDataSet.class.getFields()){
-            Object current = new Object();
-            UObject.Set(current, "alias", field.getName());
-            UObject.Set(current, "sourceField", field.getName());
-            UObject.Set(current, "type", field.getType());
+            DtoMetadata current = new DtoMetadata();
+            current.alias = field.getName();
+            current.sourceField = current.alias;
+            current.type = field.getType().getName().toLowerCase().replace("java.lang.", "");
             fields.add(current);
         }
         return new ActionResponse(fields);

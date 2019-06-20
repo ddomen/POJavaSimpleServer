@@ -68,8 +68,8 @@ public class Client {
     }
 
     public List<DtoDataSet> CollectData(DtoPackage metadata) throws Exception{
-        DtoMetadataResource source = null;
-        for(DtoMetadataResource resource: metadata.result.resources){
+        DtoPackageResource source = null;
+        for(DtoPackageResource resource: metadata.result.resources){
             if(resource.format.equalsIgnoreCase("csv")){
                 source = resource;
                 break;
