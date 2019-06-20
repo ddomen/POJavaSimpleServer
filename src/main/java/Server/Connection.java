@@ -59,6 +59,7 @@ public class Connection implements Runnable{
             put(200, "OK");
             put(404, "NOT FOUND");
             put(500, "INTERNAL SERVER ERROR");
+            put(503, "SERVICE UNAVAILABLE");
         }
     };
 

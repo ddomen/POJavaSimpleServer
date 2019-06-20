@@ -5,6 +5,8 @@ import java.util.List;
 
 import Dto.*;
 
+import javax.swing.*;
+
 public class Controller {
     protected String url;
     protected String method;
@@ -31,5 +33,10 @@ public class Controller {
 
     public ActionResponse NotFound(DtoMetadata metadata, List<DtoDataSet> dataset){ return new ActionResponse("Not Found", 404); }
 
-    public ActionResponse getMetadata(DtoMetadata metadata, List<DtoDataSet> dataset){ return new ActionResponse(metadata); }
+    public ActionResponse getMetadata(DtoMetadata metadata, List<DtoDataSet> dataset){
+        if(metadata == null){
+            return new ActionResponse("Servizio Non Ancora Disponibile", 503);
+        }
+        return new ActionResponse(metadata);
+    }
 }
