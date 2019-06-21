@@ -20,7 +20,7 @@ public class Controller {
         this.headers = headers;
     }
 
-    public ActionResponse Execute(DtoPackage dtoPackage, List<DtoDataSet> dataset){
+    public ActionResponse Execute(DtoPackage dtoPackage, List<DtoData> dataset){
         if(dtoPackage == null || dataset == null){ return ActionResponse.ServiceUnavailable; }
         Method action = null;
         Class[] arguments = new Class[2];
@@ -39,8 +39,8 @@ public class Controller {
         return this.response;
     }
 
-    public ActionResponse NotFound(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return ActionResponse.NotFound; }
-    public ActionResponse Default(DtoPackage dtoPackage, List<DtoDataSet> dataset){
+    public ActionResponse NotFound(DtoPackage dtoPackage, List<DtoData> dataset){ return ActionResponse.NotFound; }
+    public ActionResponse Default(DtoPackage dtoPackage, List<DtoData> dataset){
         String[] apis = new String[]{ "package", "metadata", "data", "stats" };
         String defaultResponse = "<!DOCTYPE html><html><head></head><body><h1>PATHS:</h1><br/>";
         for(String api : apis){ defaultResponse += "<h3><a href=\"" + api + "\">" + api + "</a></h3>"; }
@@ -48,13 +48,13 @@ public class Controller {
         return new ActionResponse(defaultResponse).Html();
     }
 
-    public ActionResponse postPackage(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return this.getPackage(dtoPackage, dataset); }
-    public ActionResponse getPackage(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return new ActionResponse(dtoPackage).Json(); }
+    public ActionResponse postPackage(DtoPackage dtoPackage, List<DtoData> dataset){ return this.getPackage(dtoPackage, dataset); }
+    public ActionResponse getPackage(DtoPackage dtoPackage, List<DtoData> dataset){ return new ActionResponse(dtoPackage).Json(); }
 
-    public ActionResponse postMetadata(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return this.getMetadata(dtoPackage, dataset); }
-    public ActionResponse getMetadata(DtoPackage dtoPackage, List<DtoDataSet> dataset){
+    public ActionResponse postMetadata(DtoPackage dtoPackage, List<DtoData> dataset){ return this.getMetadata(dtoPackage, dataset); }
+    public ActionResponse getMetadata(DtoPackage dtoPackage, List<DtoData> dataset){
         List<DtoMetadata> fields = new ArrayList<DtoMetadata>();
-        for(Field field : DtoDataSet.class.getFields()){
+        for(Field field : DtoData.class.getFields()){
             DtoMetadata current = new DtoMetadata();
             current.sourceField = field.getName();
             current.alias = current.sourceField.toLowerCase();
@@ -64,19 +64,32 @@ public class Controller {
         return new ActionResponse(fields).Json();
     }
 
-    public ActionResponse postData(DtoPackage dtoPackage, List<DtoDataSet> dataset) { return this.getData(dtoPackage, dataset); }
-    public ActionResponse getData(DtoPackage dtoPackage, List<DtoDataSet> dataset){
-        List<DtoDataSet> result = dataset;
-        if(parameters.containsKey("filter")){
-            String filterJson = parameters.get("filter").toLowerCase();
-            DtoFilter filter = UObject.fromJSON(filterJson, DtoFilter.Data.class);
-            if(filter == null){ return ActionResponse.BadRequest; }
-            result = filter.Apply(result);
-        }
+    public ActionResponse postData(DtoPackage dtoPackage, List<DtoData> dataset) { return this.getData(dtoPackage, dataset); }
+    public ActionResponse getData(DtoPackage dtoPackage, List<DtoData> dataset){
+        List<DtoData> result = ApplyFilter(dataset);
+        if(result == null){ return ActionResponse.BadRequest; }
         return new ActionResponse(result).Json();
     }
 
-//    public ActionResponse getStats(DtoPackage dtoPackage, List<DtoDataSet> dataset){
-//
-//    }
+    public ActionResponse postStats(DtoPackage dtoPackage, List<DtoData> dataset){ return this.getStats(dtoPackage, dataset); }
+    public ActionResponse getStats(DtoPackage dtoPackage, List<DtoData> dataset){
+        List<DtoData> filtered = ApplyFilter(dataset);
+        if(filtered == null){ return ActionResponse.BadRequest; }
+
+        DtoStats result = DtoStats.Calculate(filtered);
+        if(result == null){ return ActionResponse.BadRequest; }
+
+        return new ActionResponse(result).Json();
+    }
+
+    protected List<DtoData> ApplyFilter(List<DtoData> dataset){
+        List<DtoData> result = dataset;
+        if(parameters.containsKey("filter")){
+            String filterJson = parameters.get("filter").toLowerCase();
+            DtoFilter filter = UObject.fromJSON(filterJson, DtoFilter.Data.class);
+            if(filter == null){ return null; }
+            result = filter.Apply(result);
+        }
+        return result;
+    }
 }
