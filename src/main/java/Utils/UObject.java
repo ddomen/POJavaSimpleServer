@@ -6,6 +6,12 @@ import java.lang.reflect.Field;
 
 public final class UObject {
 
+    /**
+     * Recupera un campo di un oggetto a partire dal suo nome
+     * @param object oggetto destinatario
+     * @param property nome del campo
+     * @return campo
+     */
     public static Field GetField(Object object, String property){
         Class<?> _class = object.getClass();
         while (_class != null) {
@@ -20,18 +26,41 @@ public final class UObject {
         return null;
     }
 
+    /**
+     * Recupera la classe del campo di un oggetto
+     * @param object oggetto destinatario
+     * @param property nome del campo
+     * @return classe del campo
+     */
     public static Class GetType(Object object, String property){
         Field field = UObject.GetField(object, property);
         if(field != null){ return field.getType(); }
         return null;
     }
 
+
+    /**
+     * Recupera il valore di un campo di un oggetto
+     * @param object oggetto destinatario
+     * @param property nome del campo
+     * @param <ReturnType> classe per castare
+     * @return valore del campo (o null se inesistente)
+     * @throws IllegalAccessException
+     */
     public static <ReturnType> ReturnType Get(Object object, String property) throws IllegalAccessException{
         Field field = UObject.GetField(object, property);
         if(field != null){ return (ReturnType)field.get(object); }
         return null;
     }
 
+    /**
+     * Setta il valore di un campo di un oggetto
+     * @param object oggetto destinatario
+     * @param property nome del campo
+     * @param value valore da settare
+     * @return oggetto destinatario
+     * @throws IllegalAccessException
+     */
     public static Object Set(Object object, String property, Object value) throws IllegalAccessException{
         Field field = UObject.GetField(object, property);
         if(field != null){
@@ -42,6 +71,12 @@ public final class UObject {
         return object;
     }
 
+    /**
+     * Converte un valore da stringa alla classe richiesta
+     * @param value valore da castare
+     * @param _class classe per castare
+     * @return valore castato (o null se non è possibile castare)
+     */
     public static Object Parse(String value, Class<?> _class){
         if(String.class == _class) return value;
         else if(value.length() == 0) return null;
@@ -55,15 +90,42 @@ public final class UObject {
         return null;
     }
 
+    /**
+     * Serializza un oggetto in formato json
+     * @param object oggetto destinatario
+     * @return stringa json
+     */
     public static String toJSON(Object object){ return CustomGsonBuilder.create().toJson(object); }
 
-    public static <Result> Result fromJSON(String json, Class<Result> _class){return fromJSON(json, _class, true); }
+    /**
+     * Deserializza un oggetto dal formato json
+     * @param json stringa json
+     * @param _class classe per deserializzare
+     * @param <Result> classe per deserializzare
+     * @return oggetto deserializzato
+     */
+    public static <Result> Result fromJSON(String json, Class<Result> _class){return fromJSON(json, _class, false); }
+
+    /**
+     * Deserializza un oggetto dal formato json
+     * @param json stringa json
+     * @param _class classe per deserializzare
+     * @param throwException on/off generazione di eccezione nel caso di fallimento nella deserializzazione
+     * @param <Result> classe per deserializzare
+     * @return oggetto deserializzato
+     */
     public static <Result> Result fromJSON(String json, Class<Result> _class, boolean throwException) {
         try{ return (Result)CustomGsonBuilder.create().fromJson(json, _class); }
         catch (Exception ex){ if(throwException){ throw ex; } }
         return null;
     }
 
+
+    /**
+     * Registra un deserializzatore customizzato per una classe specifica, se tale classe non è già stata associata ad un altro deserializzatore
+     * @param _class classe destinataria
+     * @param deserializer deserializzatore
+     */
     public static void RegisterJsonDeserializer(Class _class, JsonDeserializer deserializer){
         if(!Deserializers.containsKey(_class)){
             CustomGsonBuilder.registerTypeAdapter(_class, deserializer);
@@ -71,6 +133,12 @@ public final class UObject {
         }
     }
 
+    /**
+     * GsonBuilder per aggiungere la possibilità di ussare deserializzatori customizzati
+     */
     private static GsonBuilder CustomGsonBuilder = new GsonBuilder();
+    /**
+     * Mappa dei deserializzatori abbinati alle classi
+     */
     private static Map<Class, JsonDeserializer> Deserializers = new HashMap<Class, JsonDeserializer>();
 }
