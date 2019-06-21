@@ -29,16 +29,30 @@ public class Controller {
         Class[] arguments = new Class[2];
         arguments[0] = DtoPackage.class;
         arguments[1] = List.class;
-        try{
-            if(this.url.isEmpty()){ action = this.getClass().getMethod("Default", arguments); }
-            else{ action = this.getClass().getMethod(method.toLowerCase() + url.substring(0, 1).toUpperCase() + url.substring(1).toLowerCase(), arguments); }
-        }
+        String originalActionName = method.toLowerCase() + (this.url.isEmpty() ? "" : (url.substring(0, 1).toUpperCase() + url.substring(1).toLowerCase()));
+        String actionName = this.url.isEmpty() ? "Default" : originalActionName;
+        try{ action = this.getClass().getMethod(actionName, arguments); }
         catch(Exception ex){
-            try { action = this.getClass().getMethod("NotFound", arguments); }
-            catch(Exception ex2){ System.err.println("Impossibile instanziare Action"); }
+            try {
+                actionName = "NotFound";
+                action = this.getClass().getMethod(actionName, arguments);
+            }
+            catch(Exception ex2){
+                System.err.println("[" + new Date() + "][SERVER][CONTROLLER]: IMPOSSIBILE COMPLETARE AZIONE - " + originalActionName);
+                if(this.verbose){ ex2.printStackTrace(); }
+            }
         }
-        try { this.response = (ActionResponse)action.invoke(this, dtoPackage, dataset); }
-        catch (Exception ex){ this.response = ActionResponse.InternalServerError; }
+        try {
+            if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONTROLLER][ACTION]: " + actionName + " (" + originalActionName + ")"); }
+            this.response = (ActionResponse)action.invoke(this, dtoPackage, dataset);
+        }
+        catch (Exception ex){
+            this.response = ActionResponse.InternalServerError;
+            if(this.verbose){
+                System.err.println("[" + new Date() + "][SERVER][CONTROLLER][ACTION]: " + actionName + "(" + originalActionName + ")");
+                ex.printStackTrace();
+            }
+        }
         return this.response;
     }
 

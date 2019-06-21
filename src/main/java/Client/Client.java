@@ -20,7 +20,7 @@ public class Client {
     protected String Get (String url) throws Exception { return Get(url, null, null);}
     protected String Get(String url, Map<String, String> params, Map<String, String> headers) throws Exception {
         URL _url = new URL(url);
-        if(verbose){ System.out.println("[" + new Date() + "][GET][OUT]: " + _url); }
+        if(verbose){ System.out.println("[" + new Date() + "][CLIENT][GET][OUT]: " + _url); }
         HttpURLConnection connection;
 
         if(_url.getProtocol() == "https"){ connection = (HttpsURLConnection) _url.openConnection(); }
@@ -44,6 +44,7 @@ public class Client {
 
         int status = connection.getResponseCode();
         String response = null;
+        if(verbose){ System.out.println("[" + new Date() + "][CLIENT][GET][OUT]: " + status); }
         if(status == 200){
             BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;

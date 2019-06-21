@@ -2,33 +2,41 @@ import Client.*;
 import Dto.*;
 import Server.*;
 
-import java.util.List;
+import java.util.*;
 
 public class Program {
     public static void main(String[] args){
         boolean verbose = false;
         if(args.length > 0) { verbose = args[0].equalsIgnoreCase("dev"); }
 
+        if(verbose){ System.out.println("[" + new Date() + "][PROGRAM]: STARTED WITH VERBOSE MODE") ; }
+
         Client cli = new Client("https://www.dati.gov.it/api/3/action/package_show?id=32d1d774-f89d-4fdd-ba2a-1466701c4024").SetVerbose(verbose);
-        System.out.println("SERVER - CREAZIONE");
-        Server svr = new Server().SetVerbose(verbose);
+        System.out.println("[" + new Date() + "][SERVER]: CREAZIONE");
+        Server svr = new Server().SetVerbose(verbose).Start();
 
         DtoPackage dtoPackage = null;
         List<DtoData> dataset = null;
         try {
-            System.out.println("DATASET - RECUPERO");
+            System.out.println("[" + new Date() + "][SERVER][DATASET]: RECUPERO");
             dtoPackage = cli.CollectPackage();
             dataset = cli.CollectData(dtoPackage);
-            System.out.println("DATASET - RECUPERATO");
+            System.out.println("[" + new Date() + "][SERVER][DATASET]: RECUPERATO");
         }
-        catch(Exception ex){ System.out.println("Qualcosa è andato storto!"); }
-        if(dtoPackage != null){
+        catch(Exception ex){
+            System.err.println("Qualcosa è andato storto!");
+            if(verbose){ ex.printStackTrace(); }
+        }
+        if(dtoPackage != null) {
             svr.SetPackage(dtoPackage);
-            System.out.println("SERVER - PACKAGE PRONTO");
+            System.out.println("[" + new Date() + "][SERVER][PACKAGE]: SETTATO");
         }
-        if(dataset != null){
+        if(dataset != null) {
             svr.SetData(dataset);
-            System.out.println("SERVER - DATASET PRONTO");
+            System.out.println("[" + new Date() + "][SERVER][DATASET]: SETTATO");
+            if(dtoPackage != null){
+                System.out.println("[" + new Date() + "][SERVER]: PRONTO");
+            }
         }
     }
 }

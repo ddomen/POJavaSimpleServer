@@ -16,17 +16,22 @@ public class Connection implements Runnable{
     protected List<DtoData> dataset;
     protected DtoPackage dtoPackage;
     protected boolean verbose;
+    protected long ID;
+
+    private static long CONNECTION_ID = 1;
 
     public Connection(Socket connect, DtoPackage dtoPackage, List<DtoData> dataset){
         this.connect = connect;
         this.dtoPackage = dtoPackage;
         this.dataset = dataset;
+        this.ID = CONNECTION_ID++;
     }
 
     public Connection SetVerbose(boolean verbose){ this.verbose = verbose; return this; }
 
     public void run() {
         try {
+            if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: RICEZIONE"); }
             this.input = new BufferedReader(new InputStreamReader(connect.getInputStream()));
             this.output = new PrintWriter(connect.getOutputStream());
             this.dataOutput = new BufferedOutputStream(connect.getOutputStream());
@@ -45,7 +50,10 @@ public class Connection implements Runnable{
 
             Response(cnt.Execute(this.dtoPackage, this.dataset));
         }
-        catch (Exception ex){ System.err.println("Impossibile stabilire la connessione"); }
+        catch (Exception ex){
+            System.err.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: ERRORE RICEZIONE");
+            if(this.verbose){ ex.printStackTrace(); }
+        }
         finally { this.CloseBuffers(); }
     }
 
@@ -107,12 +115,17 @@ public class Connection implements Runnable{
 
     protected Connection CloseBuffers(){
         try {
+            if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: CHIUSURA"); }
             this.input.close();
             this.output.close();
             this.dataOutput.close();
             this.connect.close();
+            if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: CHIUSA"); }
         }
-        catch (Exception e) { System.err.println("Errore nella chiusura degli stream di connessione"); }
+        catch (Exception ex) {
+            System.err.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: ERRORE CHIUSURA");
+            if(this.verbose){ ex.printStackTrace(); }
+        }
         return this;
     }
 
@@ -127,6 +140,7 @@ public class Connection implements Runnable{
     };
 
     protected Connection Response(ActionResponse response) throws IOException {
+        if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: INVIO - " + response.status); }
         this.output.println("HTTP/1.1 " + response.status + " " + StatusCodes.get(response.status));
         this.output.println("Server: Java HTTP Server");
         this.output.println("Date: " + new Date());
@@ -137,6 +151,7 @@ public class Connection implements Runnable{
 
         this.dataOutput.write(response.result.getBytes(), 0, response.length);
         this.dataOutput.flush();
+        if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: INVIATA"); }
         return this;
     }
 }
