@@ -18,7 +18,7 @@ public abstract class DtoFilterOperator<Type> extends Dto {
     public List<Type> $bt;
 
 
-    public List<DtoData> Apply(List<DtoData> dataset, java.lang.String property){
+    public List<DtoData> Apply(List<DtoData> dataset, java.lang.String property) throws IllegalAccessException{
         List<DtoData> result = new ArrayList<DtoData>();
         for(DtoData data : dataset){
             Type current = UObject.Get(data, property.toUpperCase());

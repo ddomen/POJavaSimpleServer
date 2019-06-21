@@ -11,7 +11,7 @@ public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
     public List<Type> $or;
     public List<Type> $and;
 
-    public List<Interface> Apply(List<Interface> dataset){
+    public List<Interface> Apply(List<Interface> dataset) throws IllegalAccessException{
         List<Interface> result = new ArrayList<Interface>();
         result.addAll(dataset);
         Field[] fields = this.getClass().getFields();

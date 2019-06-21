@@ -3,7 +3,7 @@ import Utils.UObject;
 
 public class Dto {
 
-    public <ReturnType> ReturnType Get(String property){ return UObject.Get(this, property); }
-
-    public Dto Set(String property, Object value) throws IllegalStateException{ return (Dto)UObject.Set(this, property, value); }
+    public Class GetType(String property){ return UObject.GetType(this, property); }
+    public <ReturnType> ReturnType Get(String property) throws IllegalAccessException { return UObject.Get(this, property); }
+    public Dto Set(String property, Object value) throws IllegalAccessException{ return (Dto)UObject.Set(this, property, value); }
 }

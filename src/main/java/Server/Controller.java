@@ -35,7 +35,10 @@ public class Controller {
             catch(Exception ex2){ System.err.println("Impossibile instanziare Action"); }
         }
         try { this.response = (ActionResponse)action.invoke(this, dtoPackage, dataset); }
-        catch (Exception ex){ this.response = ActionResponse.InternalServerError; }
+        catch (Exception ex){
+            this.response = ActionResponse.InternalServerError;
+            ex.printStackTrace();
+        }
         return this.response;
     }
 
@@ -73,22 +76,28 @@ public class Controller {
 
     public ActionResponse postStats(DtoPackage dtoPackage, List<DtoData> dataset){ return this.getStats(dtoPackage, dataset); }
     public ActionResponse getStats(DtoPackage dtoPackage, List<DtoData> dataset){
+        if(!parameters.containsKey("field")){ return ActionResponse.BadRequest; }
+
         List<DtoData> filtered = ApplyFilter(dataset);
         if(filtered == null){ return ActionResponse.BadRequest; }
 
-        DtoStats result = DtoStats.Calculate(filtered);
-        if(result == null){ return ActionResponse.BadRequest; }
-
-        return new ActionResponse(result).Json();
+        String field = parameters.get("field").toUpperCase();
+        try {
+            DtoStats result = DtoStats.Calculate(field, filtered);
+            if (result == null) { return ActionResponse.BadRequest; }
+            return new ActionResponse(result).Json();
+        }
+        catch(IllegalAccessException ex){ return new ActionResponse("Field " + field + " not found!", 400).Html(); }
     }
 
-    protected List<DtoData> ApplyFilter(List<DtoData> dataset){
+    protected List<DtoData> ApplyFilter(List<DtoData> dataset) {
         List<DtoData> result = dataset;
         if(parameters.containsKey("filter")){
             String filterJson = parameters.get("filter").toLowerCase();
             DtoFilter filter = UObject.fromJSON(filterJson, DtoFilter.Data.class);
             if(filter == null){ return null; }
-            result = filter.Apply(result);
+            try{ result = filter.Apply(result); }
+            catch (IllegalAccessException ex){ return null; }
         }
         return result;
     }
