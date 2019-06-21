@@ -1,7 +1,7 @@
 package Utils;
 
-import com.google.gson.Gson;
-
+import com.google.gson.*;
+import java.util.*;
 import java.lang.reflect.Field;
 
 public final class UObject {
@@ -55,18 +55,22 @@ public final class UObject {
         return null;
     }
 
-    public static String toJSON(Object object){ return new Gson().toJson(object); }
+    public static String toJSON(Object object){ return CustomGsonBuilder.create().toJson(object); }
 
-    public static <Result> Result fromJSON(String json, Class<Result> _class) {
-        try{ return (Result)new Gson().fromJson(json, _class); }
-        catch (Exception ex){ return null; }
+    public static <Result> Result fromJSON(String json, Class<Result> _class){return fromJSON(json, _class, true); }
+    public static <Result> Result fromJSON(String json, Class<Result> _class, boolean throwException) {
+        try{ return (Result)CustomGsonBuilder.create().fromJson(json, _class); }
+        catch (Exception ex){ if(throwException){ throw ex; } }
+        return null;
     }
 
-    public static <Result> Result fromJSON(String json, Class<Result> _class, boolean throwException) throws Exception{
-        try{ return (Result)new Gson().fromJson(json, _class); }
-        catch (Exception ex){
-            if(throwException){ throw ex; }
-            else{ return null; }
+    public static void RegisterJsonDeserializer(Class _class, JsonDeserializer deserializer){
+        if(!Deserializers.containsKey(_class)){
+            CustomGsonBuilder.registerTypeAdapter(_class, deserializer);
+            Deserializers.put(_class, deserializer);
         }
     }
+
+    private static GsonBuilder CustomGsonBuilder = new GsonBuilder();
+    private static Map<Class, JsonDeserializer> Deserializers = new HashMap<Class, JsonDeserializer>();
 }
