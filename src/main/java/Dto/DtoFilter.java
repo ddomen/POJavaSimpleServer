@@ -17,7 +17,7 @@ public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
         Field[] fields = this.getClass().getFields();
         for(Field field : fields){
             String property = field.getName();
-            if(property == "$and" || property == "$or"){ continue; }
+            if(property.startsWith("$")){ continue; }
             DtoFilterOperator operator = (DtoFilterOperator)UObject.Get(this, property);
             if(operator != null){ result =  operator.Apply(result, property); }
         }
@@ -25,7 +25,8 @@ public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
         if($or != null){
             List<Interface> orResult = new ArrayList<Interface>();
             for(Type or : $or){ orResult.addAll(or.Apply(result)); }
-            for(Interface r : result){ if(!orResult.contains(r)){ result.remove(r); } }
+            result.clear();
+            for(Interface r : orResult){ if(!result.contains(r)){ result.add(r); } }
         }
         if($and != null){ for(Type and : $and){ result = and.Apply(result); } }
 

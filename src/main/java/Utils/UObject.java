@@ -59,9 +59,7 @@ public final class UObject {
 
     public static <Result> Result fromJSON(String json, Class<Result> _class) {
         try{ return (Result)new Gson().fromJson(json, _class); }
-        catch (Exception ex){
-            return null;
-        }
+        catch (Exception ex){ return null; }
     }
 
     public static <Result> Result fromJSON(String json, Class<Result> _class, boolean throwException) throws Exception{
