@@ -11,13 +11,16 @@ import Utils.*;
 public class Client {
 
     protected String baseUrl;
+    protected boolean verbose = false;
 
     public Client(String baseUrl){ this.baseUrl = baseUrl; }
 
-    protected String Get (String url) throws IOException, Exception { return Get(url, null, null);}
-    protected String Get(String url, Map<String, String> params, Map<String, String> headers) throws IOException, Exception {
-        URL _url = new URL(url);
+    public Client SetVerbose(boolean verbose){ this.verbose = verbose; return this; }
 
+    protected String Get (String url) throws Exception { return Get(url, null, null);}
+    protected String Get(String url, Map<String, String> params, Map<String, String> headers) throws Exception {
+        URL _url = new URL(url);
+        if(verbose){ System.out.println("[" + new Date() + "][GET][OUT]: " + _url); }
         HttpURLConnection connection;
 
         if(_url.getProtocol() == "https"){ connection = (HttpsURLConnection) _url.openConnection(); }

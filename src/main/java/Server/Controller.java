@@ -12,6 +12,7 @@ public class Controller {
     protected Map<String, String> parameters;
     protected Map<String, String> headers;
     protected ActionResponse response;
+    protected boolean verbose;
 
     public Controller(String method, String url, Map<String, String> headers, Map<String, String> parameters){
         this.method = method;
@@ -19,6 +20,8 @@ public class Controller {
         this.parameters = parameters;
         this.headers = headers;
     }
+
+    public Controller SetVerbose(boolean verbose){ this.verbose = verbose; return this; }
 
     public ActionResponse Execute(DtoPackage dtoPackage, List<DtoData> dataset){
         if(dtoPackage == null || dataset == null){ return ActionResponse.ServiceUnavailable; }
@@ -35,10 +38,7 @@ public class Controller {
             catch(Exception ex2){ System.err.println("Impossibile instanziare Action"); }
         }
         try { this.response = (ActionResponse)action.invoke(this, dtoPackage, dataset); }
-        catch (Exception ex){
-            this.response = ActionResponse.InternalServerError;
-            ex.printStackTrace();
-        }
+        catch (Exception ex){ this.response = ActionResponse.InternalServerError; }
         return this.response;
     }
 

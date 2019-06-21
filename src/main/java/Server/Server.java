@@ -9,6 +9,7 @@ public class Server {
     protected final int port;
     protected ServerThread runner;
     protected Thread thread;
+    protected boolean verbose;
 
     public Server(){
         this.port = 80;
@@ -19,9 +20,11 @@ public class Server {
         this.Start();
     }
 
+    public Server SetVerbose(boolean verbose){ this.verbose = verbose; return this; }
+
     protected Server Start(){
         try{
-            this.runner = new ServerThread(this.port);
+            this.runner = new ServerThread(this.port).SetVerbose(this.verbose);
             this.thread = new Thread(this.runner);
             thread.start();
         }

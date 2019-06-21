@@ -15,12 +15,15 @@ public class Connection implements Runnable{
     protected BufferedOutputStream dataOutput;
     protected List<DtoData> dataset;
     protected DtoPackage dtoPackage;
+    protected boolean verbose;
 
     public Connection(Socket connect, DtoPackage dtoPackage, List<DtoData> dataset){
         this.connect = connect;
         this.dtoPackage = dtoPackage;
         this.dataset = dataset;
     }
+
+    public Connection SetVerbose(boolean verbose){ this.verbose = verbose; return this; }
 
     public void run() {
         try {
@@ -38,7 +41,7 @@ public class Connection implements Runnable{
 
             Map<String, String> headers = this.GetHeaders();
 
-            Controller cnt = new Controller(method, url, headers, GetParameters(params));
+            Controller cnt = new Controller(method, url, headers, GetParameters(params)).SetVerbose(this.verbose);
 
             Response(cnt.Execute(this.dtoPackage, this.dataset));
         }

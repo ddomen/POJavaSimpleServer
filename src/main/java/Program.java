@@ -6,9 +6,12 @@ import java.util.List;
 
 public class Program {
     public static void main(String[] args){
-        Client cli = new Client("https://www.dati.gov.it/api/3/action/package_show?id=32d1d774-f89d-4fdd-ba2a-1466701c4024");
+        boolean verbose = false;
+        if(args.length > 0) { verbose = args[0].equalsIgnoreCase("dev"); }
+
+        Client cli = new Client("https://www.dati.gov.it/api/3/action/package_show?id=32d1d774-f89d-4fdd-ba2a-1466701c4024").SetVerbose(verbose);
         System.out.println("SERVER - CREAZIONE");
-        Server svr = new Server();
+        Server svr = new Server().SetVerbose(verbose);
 
         DtoPackage dtoPackage = null;
         List<DtoData> dataset = null;
@@ -18,10 +21,7 @@ public class Program {
             dataset = cli.CollectData(dtoPackage);
             System.out.println("DATASET - RECUPERATO");
         }
-        catch(Exception ex){
-            System.out.println("Qualcosa è andato storto!");
-            ex.printStackTrace();
-        }
+        catch(Exception ex){ System.out.println("Qualcosa è andato storto!"); }
         if(dtoPackage != null){
             svr.SetPackage(dtoPackage);
             System.out.println("SERVER - PACKAGE PRONTO");
