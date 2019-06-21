@@ -31,24 +31,26 @@ public class Connection implements Runnable{
 
     public void run() {
         try {
-            if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: RICEZIONE"); }
+            if (this.verbose) { System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: RICEZIONE"); }
             this.input = new BufferedReader(new InputStreamReader(connect.getInputStream()));
             this.output = new PrintWriter(connect.getOutputStream());
             this.dataOutput = new BufferedOutputStream(connect.getOutputStream());
 
             String input = this.input.readLine();
-            StringTokenizer parse = new StringTokenizer(input);
-            String method = parse.nextToken().toUpperCase();
-            String[] uri = parse.nextToken().toLowerCase().substring(1).split("\\?");
-            String url = uri[0];
-            String params = "";
-            if(uri.length > 1){ params = uri[1]; }
+            if (input != null) {
+                StringTokenizer parse = new StringTokenizer(input);
+                String method = parse.nextToken().toUpperCase();
+                String[] uri = parse.nextToken().toLowerCase().substring(1).split("\\?");
+                String url = uri[0];
+                String params = "";
+                if (uri.length > 1) { params = uri[1]; }
 
-            Map<String, String> headers = this.GetHeaders();
+                Map<String, String> headers = this.GetHeaders();
 
-            Controller cnt = new Controller(method, url, headers, GetParameters(params)).SetVerbose(this.verbose);
+                Controller cnt = new Controller(method, url, headers, GetParameters(params)).SetVerbose(this.verbose);
 
-            Response(cnt.Execute(this.dtoPackage, this.dataset));
+                Response(cnt.Execute(this.dtoPackage, this.dataset));
+            }
         }
         catch (Exception ex){
             System.err.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: ERRORE RICEZIONE");
