@@ -10,12 +10,14 @@ public class Controller {
     protected String url;
     protected String method;
     protected Map<String, String> parameters;
+    protected Map<String, String> headers;
     protected ActionResponse response;
 
-    public Controller(String method, String url, Map<String, String> parameters){
+    public Controller(String method, String url, Map<String, String> headers, Map<String, String> parameters){
         this.method = method;
         this.url = url;
         this.parameters = parameters;
+        this.headers = headers;
     }
 
     public ActionResponse Execute(DtoPackage dtoPackage, List<DtoDataSet> dataset){
@@ -24,7 +26,10 @@ public class Controller {
         Class[] arguments = new Class[2];
         arguments[0] = DtoPackage.class;
         arguments[1] = List.class;
-        try{ action = this.getClass().getMethod(method.toLowerCase() + url.substring(0, 1).toUpperCase() + url.substring(1).toLowerCase(), arguments); }
+        try{
+            if(this.url.isEmpty()){ action = this.getClass().getMethod("Default", arguments); }
+            else{ action = this.getClass().getMethod(method.toLowerCase() + url.substring(0, 1).toUpperCase() + url.substring(1).toLowerCase(), arguments); }
+        }
         catch(Exception ex){
             try { action = this.getClass().getMethod("NotFound", arguments); }
             catch(Exception ex2){ System.err.println("Impossibile instanziare Action"); }
@@ -35,9 +40,18 @@ public class Controller {
     }
 
     public ActionResponse NotFound(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return ActionResponse.NotFound; }
+    public ActionResponse Default(DtoPackage dtoPackage, List<DtoDataSet> dataset){
+        String[] apis = new String[]{ "package", "metadata", "data", "stats" };
+        String defaultResponse = "<!DOCTYPE html><html><head></head><body><h1>PATHS:</h1><br/>";
+        for(String api : apis){ defaultResponse += "<h3><a href=\"" + api + "\">" + api + "</a></h3>"; }
+        defaultResponse += "</body></html>";
+        return new ActionResponse(defaultResponse).Html();
+    }
 
-    public ActionResponse getPackage(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return new ActionResponse(dtoPackage); }
+    public ActionResponse postPackage(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return this.getPackage(dtoPackage, dataset); }
+    public ActionResponse getPackage(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return new ActionResponse(dtoPackage).Json(); }
 
+    public ActionResponse postMetadata(DtoPackage dtoPackage, List<DtoDataSet> dataset){ return this.getMetadata(dtoPackage, dataset); }
     public ActionResponse getMetadata(DtoPackage dtoPackage, List<DtoDataSet> dataset){
         List<DtoMetadata> fields = new ArrayList<DtoMetadata>();
         for(Field field : DtoDataSet.class.getFields()){
@@ -47,17 +61,22 @@ public class Controller {
             current.type = field.getType().getName().toLowerCase().replace("java.lang.", "");
             fields.add(current);
         }
-        return new ActionResponse(fields);
+        return new ActionResponse(fields).Json();
     }
 
+    public ActionResponse postData(DtoPackage dtoPackage, List<DtoDataSet> dataset) { return this.getData(dtoPackage, dataset); }
     public ActionResponse getData(DtoPackage dtoPackage, List<DtoDataSet> dataset){
         List<DtoDataSet> result = dataset;
         if(parameters.containsKey("filter")){
             String filterJson = parameters.get("filter").toLowerCase();
-            DtoDataFilter filter = UObject.fromJSON(filterJson, DtoDataFilter.class);
+            DtoFilter filter = UObject.fromJSON(filterJson, DtoFilter.Data.class);
             if(filter == null){ return ActionResponse.BadRequest; }
             result = filter.Apply(result);
         }
-        return new ActionResponse(result);
+        return new ActionResponse(result).Json();
     }
+
+//    public ActionResponse getStats(DtoPackage dtoPackage, List<DtoDataSet> dataset){
+//
+//    }
 }

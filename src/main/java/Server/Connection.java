@@ -36,31 +36,54 @@ public class Connection implements Runnable{
             String params = "";
             if(uri.length > 1){ params = uri[1]; }
 
-            StringBuilder _body = new StringBuilder();
-            String currentLine;
-            while((currentLine = this.input.readLine()) != null){ _body.append(currentLine + "\n"); }
-            String body = _body.toString();
+            Map<String, String> headers = this.GetHeaders();
 
-            Map<String, String> parameterMap = this.ParseParameters(params);
-            if(body.length() > 0) {
-                Map<String, String> bodyMap = this.ParseBody("{}");
-                parameterMap.putAll(bodyMap);
-            }
-
-            Controller cnt = new Controller(method, url, parameterMap);
+            Controller cnt = new Controller(method, url, headers, GetParameters(params));
 
             Response(cnt.Execute(this.dtoPackage, this.dataset));
         }
-        catch (Exception ex){ System.err.println("Impossibile stabilire la connessione");  }
+        catch (Exception ex){ System.err.println("Impossibile stabilire la connessione"); }
         finally { this.CloseBuffers(); }
     }
 
-    protected Map<String, String> ParseBody(String body){
-        Map<String, Object> bodyMap = UObject.fromJSON(body, Map.class);
+    protected Map<String, String> GetParameters(String params) throws IOException {
+        Map<String, String> parameterMap = this.ParseParameters(params);
+        String body = this.GetBody();
+
+        if(body.length() > 0) {
+            Map<String, String> bodyMap = this.ParseBody(body);
+            parameterMap.putAll(bodyMap);
+        }
+        return parameterMap;
+    }
+
+    protected String GetBody() throws IOException{
+        StringBuilder body = new StringBuilder();
+        while(this.input.ready()){ body.append((char) this.input.read()); }
+        return body.toString();
+    }
+
+    protected Map<String, String> GetHeaders() throws IOException{
         Map<String, String> result = new HashMap<String, String>();
-        for(Map.Entry<String, Object> entry : bodyMap.entrySet()){
-            Object value = entry.getValue();
-            result.put(entry.getKey(), value == null ? "null" : value.toString());
+
+        String currentLine = this.input.readLine();
+        while(currentLine != null && !currentLine.isEmpty()){
+            String[] head = currentLine.split(":", 2);
+            result.put(head[0].trim(), head[1].trim());
+            currentLine = this.input.readLine();
+        }
+
+        return result;
+    }
+
+    protected Map<String, String> ParseBody(String body){
+        Map<String, String> result = new HashMap<String, String>();
+        if(!body.isEmpty()){
+            Map<String, Object> bodyMap = UObject.fromJSON(body, Map.class);
+            for(Map.Entry<String, Object> entry : bodyMap.entrySet()){
+                Object value = entry.getValue();
+                result.put(entry.getKey().trim(), (value == null ? "null" : value.toString()).trim());
+            }
         }
         return result;
     }
@@ -104,7 +127,7 @@ public class Connection implements Runnable{
         this.output.println("HTTP/1.1 " + response.status + " " + StatusCodes.get(response.status));
         this.output.println("Server: Java HTTP Server");
         this.output.println("Date: " + new Date());
-        this.output.println("Content-type: application/json" );
+        this.output.println("Content-type: " + response.contentType);
         this.output.println("Content-length: " + response.length);
         this.output.println();
         this.output.flush();
