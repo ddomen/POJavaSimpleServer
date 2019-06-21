@@ -2,7 +2,7 @@ package Utils;
 
 import java.util.*;
 
-public class UCsv {
+public final class UCsv {
 
     public static <ReturnType> List<ReturnType> Parse(String csv, Class<ReturnType> _class) throws InstantiationException, IllegalAccessException { return Parse(csv, _class,";"); }
 

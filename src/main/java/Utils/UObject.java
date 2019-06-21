@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 
 import java.lang.reflect.Field;
 
-public class UObject {
+public final class UObject {
 
     public static <ReturnType> ReturnType Get(Object object, String property){
         Class<?> _class = object.getClass();
