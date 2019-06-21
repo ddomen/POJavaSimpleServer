@@ -17,14 +17,17 @@ public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
         Field[] fields = this.getClass().getFields();
         for(Field field : fields){
             String property = field.getName();
+            if(property == "$and" || property == "$or"){ continue; }
             DtoFilterOperator operator = (DtoFilterOperator)UObject.Get(this, property);
             if(operator != null){ result =  operator.Apply(result, property); }
         }
 
-        final List<Interface> orResult = new ArrayList<Interface>();
-        for(Type or : $or){ orResult.addAll(or.Apply(result)); }
-        for(Interface r : result){ if(!orResult.contains(r)){ result.remove(r); } }
-        for(Type and : $and){ result = and.Apply(result); }
+        if($or != null){
+            List<Interface> orResult = new ArrayList<Interface>();
+            for(Type or : $or){ orResult.addAll(or.Apply(result)); }
+            for(Interface r : result){ if(!orResult.contains(r)){ result.remove(r); } }
+        }
+        if($and != null){ for(Type and : $and){ result = and.Apply(result); } }
 
         return result;
     }

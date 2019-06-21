@@ -22,7 +22,7 @@ public abstract class DtoFilterOperator<Type> extends Dto {
         List<DtoData> result = new ArrayList<DtoData>();
         for(DtoData data : dataset){
             Type current = UObject.Get(data, property.toUpperCase());
-            if($eq != null && this.NotEqual(current, $not)) continue;
+            if($eq != null && this.NotEqual(current, $eq)) continue;
             if($not != null && this.Equal(current, $not)) continue;
             if($in != null && this.NotContained(current, $in)) continue;
             if($nin != null && this.Contained(current, $nin)) continue;
