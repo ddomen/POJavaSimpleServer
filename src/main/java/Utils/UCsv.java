@@ -4,8 +4,26 @@ import java.util.*;
 
 public final class UCsv {
 
+    /**
+     * Converte un csv in una lista di oggetti
+     * @param csv stringa contenente le righe csv
+     * @param _class classe con cui parsare le righe del csv
+     * @param <ReturnType> classe per parsare
+     * @return lista di oggetti con classe richiesta
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
     public static <ReturnType> List<ReturnType> Parse(String csv, Class<ReturnType> _class) throws InstantiationException, IllegalAccessException { return Parse(csv, _class,";"); }
 
+    /**
+     * @param csv stringa contenente le righe csv
+     * @param _class classe con cui parsare le righe del csv
+     * @param separator stringa di separazione fra le colonne del csv
+     * @param <ReturnType> classe per parsare
+     * @return lista di oggetti con classe richiesta
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
     public static <ReturnType> List<ReturnType> Parse(String csv, Class<ReturnType> _class, String separator) throws InstantiationException, IllegalAccessException{
         List<ReturnType> result = new ArrayList<ReturnType>();
 
