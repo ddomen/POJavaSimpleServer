@@ -1,11 +1,11 @@
 package Server;
 
 import java.io.*;
-import java.net.Socket;
-import java.net.URLDecoder;
+import java.net.*;
 import java.util.*;
 
 import Dto.*;
+import Utils.UObject;
 
 
 public class Connection implements Runnable{
@@ -36,12 +36,33 @@ public class Connection implements Runnable{
             String params = "";
             if(uri.length > 1){ params = uri[1]; }
 
-            Controller cnt = new Controller(method, url, ParseParameters(params));
+            StringBuilder _body = new StringBuilder();
+            String currentLine;
+            while((currentLine = this.input.readLine()) != null){ _body.append(currentLine + "\n"); }
+            String body = _body.toString();
+
+            Map<String, String> parameterMap = this.ParseParameters(params);
+            if(body.length() > 0) {
+                Map<String, String> bodyMap = this.ParseBody("{}");
+                parameterMap.putAll(bodyMap);
+            }
+
+            Controller cnt = new Controller(method, url, parameterMap);
 
             Response(cnt.Execute(this.dtoPackage, this.dataset));
         }
         catch (Exception ex){ System.err.println("Impossibile stabilire la connessione");  }
         finally { this.CloseBuffers(); }
+    }
+
+    protected Map<String, String> ParseBody(String body){
+        Map<String, Object> bodyMap = UObject.fromJSON(body, Map.class);
+        Map<String, String> result = new HashMap<String, String>();
+        for(Map.Entry<String, Object> entry : bodyMap.entrySet()){
+            Object value = entry.getValue();
+            result.put(entry.getKey(), value == null ? "null" : value.toString());
+        }
+        return result;
     }
 
     protected Map<String, String> ParseParameters(String parameters){
