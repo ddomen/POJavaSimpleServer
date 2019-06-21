@@ -3,6 +3,7 @@ package Dto;
 public class DtoDataSet extends Dto {
     public Long ID;
     public Long CODICE_ASL;
+    public Long CODICE_ISTAT_COMUNE;
     public String ASL;
     public String DISTRETTO;
     public String RAPPORTO_SSR;
@@ -10,7 +11,6 @@ public class DtoDataSet extends Dto {
     public String DENOMINAZIONE_STRUTTURA_OPERATIVA;
     public String P_IVA;
     public String INDIRIZZO_SEDE_OPERATIVA;
-    public Long CODICE_ISTAT_COMUNE;
     public String COMUNE_SEDE_OPERATIVA;
     public String PROVINCIA;
     public String ATTIVITA;
