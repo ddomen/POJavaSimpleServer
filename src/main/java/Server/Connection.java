@@ -13,10 +13,10 @@ public class Connection implements Runnable{
     protected BufferedReader input;
     protected PrintWriter output;
     protected BufferedOutputStream dataOutput;
-    protected List<DtoDataSet> dataset;
+    protected List<DtoData> dataset;
     protected DtoPackage dtoPackage;
 
-    public Connection(Socket connect, DtoPackage dtoPackage, List<DtoDataSet> dataset){
+    public Connection(Socket connect, DtoPackage dtoPackage, List<DtoData> dataset){
         this.connect = connect;
         this.dtoPackage = dtoPackage;
         this.dataset = dataset;

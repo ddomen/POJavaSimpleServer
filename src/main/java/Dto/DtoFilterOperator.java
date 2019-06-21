@@ -18,9 +18,9 @@ public abstract class DtoFilterOperator<Type> extends Dto {
     public List<Type> $bt;
 
 
-    public List<DtoDataSet> Apply(List<DtoDataSet> dataset, java.lang.String property){
-        List<DtoDataSet> result = new ArrayList<DtoDataSet>();
-        for(DtoDataSet data : dataset){
+    public List<DtoData> Apply(List<DtoData> dataset, java.lang.String property){
+        List<DtoData> result = new ArrayList<DtoData>();
+        for(DtoData data : dataset){
             Type current = UObject.Get(data, property.toUpperCase());
             if($eq != null && this.NotEqual(current, $not)) continue;
             if($not != null && this.Equal(current, $not)) continue;
@@ -34,8 +34,8 @@ public abstract class DtoFilterOperator<Type> extends Dto {
             result.add(data);
         }
 
-        List<DtoDataSet> finalResult = new ArrayList<DtoDataSet>();
-        for(DtoDataSet data : dataset){ if(!finalResult.contains(data)){ finalResult.add(data); } }
+        List<DtoData> finalResult = new ArrayList<DtoData>();
+        for(DtoData data : dataset){ if(!finalResult.contains(data)){ finalResult.add(data); } }
         return finalResult;
     }
 

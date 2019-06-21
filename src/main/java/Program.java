@@ -11,7 +11,7 @@ public class Program {
         Server svr = new Server();
 
         DtoPackage dtoPackage = null;
-        List<DtoDataSet> dataset = null;
+        List<DtoData> dataset = null;
         try {
             System.out.println("DATASET - RECUPERO");
             dtoPackage = cli.CollectPackage();

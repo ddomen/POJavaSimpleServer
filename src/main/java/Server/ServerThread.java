@@ -9,12 +9,12 @@ import Dto.*;
 
 
 public class ServerThread implements Runnable{
-    protected List<DtoDataSet> dataset;
+    protected List<DtoData> dataset;
     protected DtoPackage dtoPackage;
     protected ServerSocket socket;
     public ServerThread(int port) throws IOException { this.socket = new ServerSocket(port); }
 
-    protected ServerThread SetData(List<DtoDataSet> dataset){ this.dataset = dataset; return this; }
+    protected ServerThread SetData(List<DtoData> dataset){ this.dataset = dataset; return this; }
     protected ServerThread SetPackage(DtoPackage dtoPackage){ this.dtoPackage = dtoPackage; return this; }
 
     public void run() {

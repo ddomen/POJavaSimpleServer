@@ -66,7 +66,7 @@ public class Client {
         return UObject.fromJSON(requestResult, DtoPackage.class);
     }
 
-    public List<DtoDataSet> CollectData(DtoPackage dtoPackage) throws Exception{
+    public List<DtoData> CollectData(DtoPackage dtoPackage) throws Exception{
         DtoPackageResource source = null;
         for(DtoPackageResource resource: dtoPackage.result.resources){
             if(resource.format.equalsIgnoreCase("csv")){
@@ -77,6 +77,6 @@ public class Client {
         if(source == null){ throw new Exception("Impossible to find csv resurce"); }
 
         String requestResult = this.Get(source.url);
-        return UCsv.Parse(requestResult, DtoDataSet.class);
+        return UCsv.Parse(requestResult, DtoData.class);
     }
 }

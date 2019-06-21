@@ -29,7 +29,7 @@ public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
         return result;
     }
 
-    public static class Data extends DtoFilter<Data, DtoDataSet>{
+    public static class Data extends DtoFilter<Data, DtoData>{
         public DtoFilterOperator.Long id;
         public DtoFilterOperator.Long codice_asl;
         public DtoFilterOperator.Long codice_istat_comune;

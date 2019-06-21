@@ -1,6 +1,6 @@
 package Dto;
 
-public class DtoDataSet extends Dto {
+public class DtoData extends Dto {
     public Long ID;
     public Long CODICE_ASL;
     public Long CODICE_ISTAT_COMUNE;

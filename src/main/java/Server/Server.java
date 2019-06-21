@@ -1,6 +1,6 @@
 package Server;
 
-import Dto.DtoDataSet;
+import Dto.DtoData;
 import Dto.DtoPackage;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public class Server {
         this.port = 80;
         this.Start();
     }
-    public Server(List<DtoDataSet> dataset, int port) {
+    public Server(List<DtoData> dataset, int port) {
         this.port = port;
         this.Start();
     }
@@ -34,6 +34,6 @@ public class Server {
         return this;
     }
 
-    public Server SetData(List<DtoDataSet> dataset){ this.runner.SetData(dataset); return this; }
+    public Server SetData(List<DtoData> dataset){ this.runner.SetData(dataset); return this; }
     public Server SetPackage(DtoPackage dtoPackage){ this.runner.SetPackage(dtoPackage); return this; }
 }
