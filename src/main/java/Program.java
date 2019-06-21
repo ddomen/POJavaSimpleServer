@@ -1,8 +1,9 @@
+import java.util.*;
+
 import Client.*;
 import Dto.*;
 import Server.*;
-
-import java.util.*;
+import Utils.UObject;
 
 public class Program {
     public static void main(String[] args){
@@ -10,6 +11,9 @@ public class Program {
         if(args.length > 0) { verbose = args[0].equalsIgnoreCase("dev"); }
 
         if(verbose){ System.out.println("[" + new Date() + "][PROGRAM]: STARTED WITH VERBOSE MODE") ; }
+
+        UObject.RegisterJsonDeserializer(DtoFilter.Data.class, DtoFilter.Deserializer);
+        UObject.RegisterJsonDeserializer(DtoFilter.Stats.class, DtoFilter.Deserializer);
 
         Client cli = new Client("https://www.dati.gov.it/api/3/action/package_show?id=32d1d774-f89d-4fdd-ba2a-1466701c4024").SetVerbose(verbose);
         System.out.println("[" + new Date() + "][SERVER]: CREAZIONE");

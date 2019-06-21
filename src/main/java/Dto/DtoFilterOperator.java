@@ -1,9 +1,9 @@
 package Dto;
 
-import Utils.UObject;
+import com.google.gson.*;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import Utils.UObject;
 
 public abstract class DtoFilterOperator<Type> extends Dto {
     public Type $not;
@@ -48,22 +48,30 @@ public abstract class DtoFilterOperator<Type> extends Dto {
     protected boolean Contained(Type member, List<Type> array){ for(Type element : array){ if(this.Equal(element, member)){ return true; } } return false; }
     protected boolean NotContained(Type member, List<Type> array){ return !this.Contained(member, array); }
 
-    public class Long extends DtoFilterOperator<java.lang.Long> {
+    public static class Long extends DtoFilterOperator<java.lang.Long> {
+        public Long(){}
+        public Long(java.lang.Long $eq){ this.$eq = $eq; }
         protected boolean Equal(java.lang.Long left, java.lang.Long right) { return left.equals(right); }
         protected boolean Greater(java.lang.Long left, java.lang.Long right) { return left > right; }
     }
 
-    public class Integer extends DtoFilterOperator<java.lang.Integer> {
+    public static class Integer extends DtoFilterOperator<java.lang.Integer> {
+        public Integer(){}
+        public Integer(java.lang.Integer $eq){ this.$eq = $eq; }
         protected boolean Equal(java.lang.Integer left, java.lang.Integer right) { return left.equals(right); }
         protected boolean Greater(java.lang.Integer left, java.lang.Integer right) { return left > right; }
     }
 
-    public class Double extends  DtoFilterOperator<java.lang.Double> {
+    public static class Double extends  DtoFilterOperator<java.lang.Double> {
+        public Double(){}
+        public Double(java.lang.Double $eq){ this.$eq = $eq; }
         protected boolean Equal(java.lang.Double left, java.lang.Double right) { return left.equals(right); }
         protected boolean Greater(java.lang.Double left, java.lang.Double right) { return left > right; }
     }
 
-    public class String extends DtoFilterOperator<java.lang.String> {
+    public static class String extends DtoFilterOperator<java.lang.String> {
+        public String(){}
+        public String(java.lang.String $eq){ this.$eq = $eq; }
         protected boolean Equal(java.lang.String left, java.lang.String right) { return left.equalsIgnoreCase(right); }
         protected boolean Greater(java.lang.String left, java.lang.String right) { return left.compareToIgnoreCase(right) > 0; }
     }
