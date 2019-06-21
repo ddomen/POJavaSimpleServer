@@ -33,10 +33,7 @@ public abstract class DtoFilterOperator<Type> extends Dto {
             if($bt != null && $bt.size() >= 2 && !this.Between(current, $bt.get(0), $bt.get(1))) continue;
             result.add(data);
         }
-
-        List<DtoData> finalResult = new ArrayList<DtoData>();
-        for(DtoData data : dataset){ if(!finalResult.contains(data)){ finalResult.add(data); } }
-        return finalResult;
+        return result;
     }
 
     protected abstract boolean Equal(Type left, Type right);
