@@ -4,6 +4,9 @@ import com.google.gson.*;
 import java.util.*;
 import java.lang.reflect.Field;
 
+/**
+ * Classe di utilità nella gestione degli oggetti
+ */
 public final class UObject {
 
     /**

@@ -5,6 +5,9 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+/**
+ * Classe di utilità nella gestione delle stringhe
+ */
 public final class UString {
     /**
      * Rimuove i caratteri unicode dannosi per le chiamate http

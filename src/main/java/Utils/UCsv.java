@@ -2,6 +2,9 @@ package Utils;
 
 import java.util.*;
 
+/**
+ * Classe di utilità nella gestione dei csv
+ */
 public final class UCsv {
 
     /**
