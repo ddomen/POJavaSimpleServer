@@ -6,13 +6,13 @@ import java.lang.reflect.Field;
 
 public final class UObject {
 
-    public static <ReturnType> ReturnType Get(Object object, String property){
+    public static Field GetField(Object object, String property){
         Class<?> _class = object.getClass();
         while (_class != null) {
             try {
                 Field field = _class.getDeclaredField(property);
                 field.setAccessible(true);
-                return (ReturnType)field.get(object);
+                return field;
             }
             catch (NoSuchFieldException ex) { _class = _class.getSuperclass(); }
             catch (Exception ex) { throw new IllegalStateException(ex); }
@@ -20,19 +20,24 @@ public final class UObject {
         return null;
     }
 
-    public static Object Set(Object object, String property, Object value) throws IllegalStateException{
-        Class<?> _class = object.getClass();
-        while (_class != null) {
-            try {
-                Field field = _class.getDeclaredField(property);
-                field.setAccessible(true);
-                Class<?> type = field.getType();
-                if(value != null && value.getClass() == String.class) { field.set(object, Parse((String)value, type)); }
-                else{ field.set(object, value); }
-                return object;
-            }
-            catch (NoSuchFieldException ex) { _class = _class.getSuperclass(); }
-            catch (Exception ex) { throw new IllegalStateException(ex); }
+    public static Class GetType(Object object, String property){
+        Field field = UObject.GetField(object, property);
+        if(field != null){ return field.getType(); }
+        return null;
+    }
+
+    public static <ReturnType> ReturnType Get(Object object, String property) throws IllegalAccessException{
+        Field field = UObject.GetField(object, property);
+        if(field != null){ return (ReturnType)field.get(object); }
+        return null;
+    }
+
+    public static Object Set(Object object, String property, Object value) throws IllegalAccessException{
+        Field field = UObject.GetField(object, property);
+        if(field != null){
+            Class<?> type = field.getType();
+            if(value != null && value.getClass() == String.class) { field.set(object, Parse((String)value, type)); }
+            else{ field.set(object, value); }
         }
         return object;
     }
