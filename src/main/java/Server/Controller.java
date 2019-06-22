@@ -6,14 +6,42 @@ import java.lang.reflect.*;
 import Dto.*;
 import Utils.UObject;
 
+/**
+ * Classe per la generazione di risposte a partire dai parametri di connessione
+ */
 public class Controller {
+    /**
+     * Indirizzo della richiesta
+     */
     protected String url;
+    /**
+     * Metodo della richiesta (supportati: GET, POST)
+     */
     protected String method;
+    /**
+     * Paramteri della richiesta
+     */
     protected Map<String, String> parameters;
+    /**
+     * Headers della richiesta
+     */
     protected Map<String, String> headers;
+    /**
+     * Risposta da recapitare alla connessione
+     */
     protected ActionResponse response;
+    /**
+     * Modalità verbose
+     */
     protected boolean verbose;
 
+    /**
+     * Genera un controller per gestire la risposta ad una connessione
+     * @param method metodo della richiesta
+     * @param url url della richiesta
+     * @param headers headers della richiesta
+     * @param parameters parametri della richiesta
+     */
     public Controller(String method, String url, Map<String, String> headers, Map<String, String> parameters){
         this.method = method;
         this.url = url;
@@ -21,8 +49,19 @@ public class Controller {
         this.headers = headers;
     }
 
+    /**
+     * Setta la modalità verbose del client
+     * @param verbose on/off modalità verbose
+     * @return oggetto this per la concatenzaione (method chaining)
+     */
     public Controller SetVerbose(boolean verbose){ this.verbose = verbose; return this; }
 
+    /**
+     * Elabora la richiesta utilizzando uno specifico dataset
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse Execute(DtoPackage dtoPackage, List<DtoData> dataset){
         if(dtoPackage == null || dataset == null){ return ActionResponse.ServiceUnavailable; }
         Method action = null;
@@ -56,7 +95,20 @@ public class Controller {
         return this.response;
     }
 
+    /**
+     * Genera una risposta 404 - Not Found
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse NotFound(DtoPackage dtoPackage, List<DtoData> dataset){ return ActionResponse.NotFound; }
+
+    /**
+     * Genera una risposta di default (pagina home)
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse Default(DtoPackage dtoPackage, List<DtoData> dataset){
         String[] apis = new String[]{ "package", "metadata", "data", "stats" };
         String defaultResponse = "<!DOCTYPE html><html><head></head><body><h1>PATHS:</h1><br/>";
@@ -65,10 +117,34 @@ public class Controller {
         return new ActionResponse(defaultResponse).Html();
     }
 
+    /**
+     * Genera una risposta ad una richiesta POST /package
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse postPackage(DtoPackage dtoPackage, List<DtoData> dataset){ return this.getPackage(dtoPackage, dataset); }
+    /**
+     * Genera una risposta ad una richiesta GET /package
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse getPackage(DtoPackage dtoPackage, List<DtoData> dataset){ return new ActionResponse(dtoPackage).Json(); }
 
+    /**
+     * Genera una risposta ad una richiesta POST /metadata
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse postMetadata(DtoPackage dtoPackage, List<DtoData> dataset){ return this.getMetadata(dtoPackage, dataset); }
+    /**
+     * Genera una risposta ad una richiesta GET /metadata
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse getMetadata(DtoPackage dtoPackage, List<DtoData> dataset){
         List<DtoMetadata> fields = new ArrayList<DtoMetadata>();
         for(Field field : DtoData.class.getFields()){
@@ -81,14 +157,44 @@ public class Controller {
         return new ActionResponse(fields).Json();
     }
 
+    /**
+     * Genera una risposta ad una richiesta POST /data params: [ filter? ]
+     * Nei parametri è possibile aggiungere il campo "filter" per filtrare il dataset
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse postData(DtoPackage dtoPackage, List<DtoData> dataset) { return this.getData(dtoPackage, dataset); }
+    /**
+     * Genera una risposta ad una richiesta GET /data params: [ filter? ]
+     * Nei parametri è possibile aggiungere il campo "filter" per filtrare il dataset
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse getData(DtoPackage dtoPackage, List<DtoData> dataset){
         List<DtoData> result = ApplyFilter(dataset);
         if(result == null){ return ActionResponse.BadRequest; }
         return new ActionResponse(result).Json();
     }
 
+    /**
+     * Genera una risposta ad una richiesta POST /data stats: [ field, filter? ]
+     * Nei parametri è necessario fornire il campo "field" che matcha con un campo del dataset
+     * Inoltre è possibile aggiungere il campo "filter" per filtrare il dataset
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse postStats(DtoPackage dtoPackage, List<DtoData> dataset){ return this.getStats(dtoPackage, dataset); }
+    /**
+     * Genera una risposta ad una richiesta GET /data stats: [ field, filter? ]
+     * Nei parametri è necessario fornire il campo "field" che matcha con un campo del dataset
+     * Inoltre è possibile aggiungere il campo "filter" per filtrare il dataset
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     * @return risposta elaborata da scrivere sulla connessione
+     */
     public ActionResponse getStats(DtoPackage dtoPackage, List<DtoData> dataset){
         if(!parameters.containsKey("field")){ return ActionResponse.BadRequest; }
 
@@ -104,6 +210,11 @@ public class Controller {
         catch(IllegalAccessException ex){ return new ActionResponse("Field " + field + " not found!", 400).Html(); }
     }
 
+    /**
+     * Applica il filtro contenuto nei parametri della richiesta ad un determinato dataset
+     * @param dataset dataset da filtrare
+     * @return dataset filtrato
+     */
     protected List<DtoData> ApplyFilter(List<DtoData> dataset) {
         List<DtoData> result = dataset;
         if(parameters.containsKey("filter")){
