@@ -34,8 +34,25 @@ public class ServerThread implements Runnable{
      */
     public ServerThread(int port) throws IOException { this.socket = new ServerSocket(port); }
 
+    /**
+     * Setta la modalità verbose del client
+     * @param verbose on/off modalità verbose
+     * @return oggetto this per la concatenzaione (method chaining)
+     */
     public ServerThread SetVerbose(boolean verbose){ this.verbose = verbose; return this; }
+
+    /**
+     * Imposta il dataset utilizzato dal server
+     * @param dataset dataset da utilizzare
+     * @return oggetto this per la concatenzaione (method chaining)
+     */
     public ServerThread SetData(List<DtoData> dataset){ this.dataset = dataset; return this; }
+
+    /**
+     * Imposta le informazioni del dataset utilizzato dal server
+     * @param dtoPackage informazioni di dataset da utilizzare
+     * @return oggetto this per la concatenzaione (method chaining)
+     */
     public ServerThread SetPackage(DtoPackage dtoPackage){ this.dtoPackage = dtoPackage; return this; }
 
     /**
