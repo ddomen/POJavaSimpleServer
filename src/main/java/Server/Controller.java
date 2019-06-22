@@ -210,7 +210,8 @@ public class Controller {
             if (result == null) { return ActionResponse.BadRequest; }
             return new ActionResponse(result).Json();
         }
-        catch(NoSuchFieldException | IllegalAccessException ex){ return new ActionResponse("Field " + field + " not found!", 400).Html(); }
+        catch (NoSuchFieldException ex){ return new ActionResponse("Field " + field + " not found!", 400).Html(); }
+        catch (IllegalAccessException ex){ return new ActionResponse("Field " + field + " not found!", 400).Html(); }
     }
 
     /**
