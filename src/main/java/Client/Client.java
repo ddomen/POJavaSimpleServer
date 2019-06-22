@@ -32,7 +32,7 @@ public class Client {
     /**
      * Setta la modalità verbose del client
      * @param verbose on/off modalità verbose
-     * @return
+     * @return oggetto this per la concatenzaione (method chaining)
      */
     public Client SetVerbose(boolean verbose){ this.verbose = verbose; return this; }
 

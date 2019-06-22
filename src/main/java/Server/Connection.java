@@ -8,18 +8,54 @@ import Dto.*;
 import Utils.UObject;
 
 
+/**
+ * Classe per la modellazione e gestione delle connessioni
+ */
 public class Connection implements Runnable{
+    /**
+     * socket di conessione server-client
+     */
     protected Socket connect;
+    /**
+     * Buffer di lettura in input
+     */
     protected BufferedReader input;
+    /**
+     * Buffer di scrittura header in output
+     */
     protected PrintWriter output;
+    /**
+     * Buffer di scrittura body in output
+     */
     protected BufferedOutputStream dataOutput;
+    /**
+     * dataset ricevuto dal server
+     */
     protected List<DtoData> dataset;
+    /**
+     * informazioni di dataset ricevute dal server
+     */
     protected DtoPackage dtoPackage;
+    /**
+     * modalità verbose
+     */
     protected boolean verbose;
+    /**
+     * Identificativo della connessione
+     */
     protected long ID;
 
+    /**
+     * Contatore identificativi di connessione
+     */
     private static long CONNECTION_ID = 1;
 
+    /**
+     * Crea un modello di connessione server - client
+     * @param connect socket di connessione
+     * @param dtoPackage informazioni sul dataset
+     * @param dataset dataset
+     */
     public Connection(Socket connect, DtoPackage dtoPackage, List<DtoData> dataset){
         this.connect = connect;
         this.dtoPackage = dtoPackage;
@@ -27,6 +63,11 @@ public class Connection implements Runnable{
         this.ID = CONNECTION_ID++;
     }
 
+    /**
+     * Setta la modalità verbose del client
+     * @param verbose on/off modalità verbose
+     * @return oggetto this per la concatenzaione (method chaining)
+     */
     public Connection SetVerbose(boolean verbose){ this.verbose = verbose; return this; }
 
     public void run() {
@@ -59,6 +100,12 @@ public class Connection implements Runnable{
         finally { this.CloseBuffers(); }
     }
 
+    /**
+     * Recupera tutti i parametri relativi alla connessione
+     * @param params query string
+     * @return mappa chiave - valore dei parametri di connessione
+     * @throws IOException
+     */
     protected Map<String, String> GetParameters(String params) throws IOException {
         Map<String, String> parameterMap = this.ParseParameters(params);
         String body = this.GetBody();
@@ -70,12 +117,22 @@ public class Connection implements Runnable{
         return parameterMap;
     }
 
+    /**
+     * Recupera il corpo del messaggio
+     * @return corpo del messaggio
+     * @throws IOException
+     */
     protected String GetBody() throws IOException{
         StringBuilder body = new StringBuilder();
         while(this.input.ready()){ body.append((char) this.input.read()); }
         return body.toString();
     }
 
+    /**
+     * Recupera gli header della connessione in una serie di chiavi - valore
+     * @return serie chiavi - valore degli header della connessione
+     * @throws IOException
+     */
     protected Map<String, String> GetHeaders() throws IOException{
         Map<String, String> result = new HashMap<String, String>();
 
@@ -89,6 +146,11 @@ public class Connection implements Runnable{
         return result;
     }
 
+    /**
+     * Recupera i parametri dal corpo della connessione in formato json
+     * @param body corpo del messaggio
+     * @return mappa chiave - valore del corpo della connessione
+     */
     protected Map<String, String> ParseBody(String body){
         Map<String, String> result = new HashMap<String, String>();
         if(!body.isEmpty()){
@@ -101,6 +163,11 @@ public class Connection implements Runnable{
         return result;
     }
 
+    /**
+     * Converte una query string in una mappa chiave - valore
+     * @param parameters query string
+     * @return mappa chiave - valore della query string
+     */
     protected Map<String, String> ParseParameters(String parameters){
         Map<String, String> result = new HashMap<String, String>();
         if(parameters.length() == 0){ return result; }
@@ -115,6 +182,10 @@ public class Connection implements Runnable{
         return result;
     }
 
+    /**
+     * Chiude tutti i Buffer relativi alla connessione, infine il socket della connessione
+     * @return oggetto this per la concatenzaione (method chaining)
+     */
     protected Connection CloseBuffers(){
         try {
             if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: CHIUSURA"); }
@@ -131,6 +202,9 @@ public class Connection implements Runnable{
         return this;
     }
 
+    /**
+     * Mappatura degli stati possibili nella risposta da aggiungere all'header
+     */
     protected HashMap<Integer, String> StatusCodes = new HashMap<Integer, String>(){
         {
             put(200, "Ok");
@@ -141,6 +215,12 @@ public class Connection implements Runnable{
         }
     };
 
+    /**
+     * Scrive una risposta sul Buffer di output
+     * @param response ActionResponse contenente la risposta
+     * @return oggetto this per la concatenzaione (method chaining)
+     * @throws IOException
+     */
     protected Connection Response(ActionResponse response) throws IOException {
         if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: INVIO - " + response.status); }
         this.output.println("HTTP/1.1 " + response.status + " " + StatusCodes.get(response.status));
