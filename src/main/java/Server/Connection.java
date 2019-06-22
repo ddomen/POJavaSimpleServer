@@ -83,7 +83,6 @@ public class Connection implements Runnable{
     /**
      * Metodo per l'esecuzione del thread
      */
-    @Override
     public void run() {
         try {
             if (this.verbose) { System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: RICEZIONE"); }

@@ -59,7 +59,6 @@ public class ServerThread implements Runnable{
     /**
      * Metodo per l'esecuzione del thread
      */
-    @Override
     public void run() {
         while(true){
             Connection connect = null;
