@@ -36,13 +36,17 @@ public class DtoStats extends Dto {
      */
     public Double sum = null;
     /**
-     * Numero di campioni
+     * Numero di campioni non nulli
      */
     public Long count = null;
     /**
      * Numero di campioni nulli
      */
     public Long empty = null;
+    /**
+     * Numero di campioni totali
+     */
+    public Long total = null;
 
     /**
      * Calcola le statistiche su un campo del dataset
@@ -65,6 +69,9 @@ public class DtoStats extends Dto {
         for(DtoData data : dataset){
             Class type = data.GetType(result.field);
             Object _value = data.Get(result.field);
+
+            if(result.total == null){ result.total = 0L; }
+            result.total++;
 
             if(_value != null && (type == Long.class || type == Integer.class || type == Double.class)){
                 //Se il valore è numerico calcolo somma, media, minimo e massimo, ed aggiungo 1 al contatore
