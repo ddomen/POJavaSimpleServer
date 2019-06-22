@@ -70,13 +70,19 @@ public class Connection implements Runnable{
      */
     public Connection SetVerbose(boolean verbose){ this.verbose = verbose; return this; }
 
+    /**
+     * Metodo per l'esecuzione del thread
+     */
+    @Override
     public void run() {
         try {
             if (this.verbose) { System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: RICEZIONE"); }
+            //Istanzio i buffer di connessione
             this.input = new BufferedReader(new InputStreamReader(connect.getInputStream()));
             this.output = new PrintWriter(connect.getOutputStream());
             this.dataOutput = new BufferedOutputStream(connect.getOutputStream());
 
+            //Leggo le informazioni dal buffer di input
             String input = this.input.readLine();
             if (input != null) {
                 StringTokenizer parse = new StringTokenizer(input);
@@ -88,6 +94,7 @@ public class Connection implements Runnable{
 
                 Map<String, String> headers = this.GetHeaders();
 
+                //Genero un controller ed eseguendolo ne ricavo la risposta
                 Controller cnt = new Controller(method, url, headers, GetParameters(params)).SetVerbose(this.verbose);
 
                 Response(cnt.Execute(this.dtoPackage, this.dataset));
@@ -107,6 +114,7 @@ public class Connection implements Runnable{
      * @throws IOException
      */
     protected Map<String, String> GetParameters(String params) throws IOException {
+        //Fondo le funzioni ParseParameter e ParseBody per ottenere una mappa unica dei parametri
         Map<String, String> parameterMap = this.ParseParameters(params);
         String body = this.GetBody();
 
@@ -123,6 +131,7 @@ public class Connection implements Runnable{
      * @throws IOException
      */
     protected String GetBody() throws IOException{
+        //Leggo il buffer di input solo dopo aver ricevuto l'header
         StringBuilder body = new StringBuilder();
         while(this.input.ready()){ body.append((char) this.input.read()); }
         return body.toString();
@@ -136,6 +145,7 @@ public class Connection implements Runnable{
     protected Map<String, String> GetHeaders() throws IOException{
         Map<String, String> result = new HashMap<String, String>();
 
+        //Ogni riga letta dal buffer di input viene splittata per il primo ":" e divisa in chiave:valore
         String currentLine = this.input.readLine();
         while(currentLine != null && !currentLine.isEmpty()){
             String[] head = currentLine.split(":", 2);
@@ -154,6 +164,7 @@ public class Connection implements Runnable{
     protected Map<String, String> ParseBody(String body){
         Map<String, String> result = new HashMap<String, String>();
         if(!body.isEmpty()){
+            //Converto il corpo in una mappa stringa - oggetto generica per poi riportarla a coppie di stringhe chiave-valore
             Map<String, Object> bodyMap = UObject.fromJSON(body, Map.class);
             for(Map.Entry<String, Object> entry : bodyMap.entrySet()){
                 Object value = entry.getValue();
@@ -171,9 +182,11 @@ public class Connection implements Runnable{
     protected Map<String, String> ParseParameters(String parameters){
         Map<String, String> result = new HashMap<String, String>();
         if(parameters.length() == 0){ return result; }
+        //Splitto i parametri per "&" e ottengo una lista di parametri nel formato "chiave=valore"
         String[] params = parameters.split("\\&");
         for(String param : params){
-            String[] pair = param.split("\\=");
+            //Ogni parametro lo splitto poi per "=" ottenendo la coppia chiave - valore da aggiungere alla mappa
+            String[] pair = param.split("\\=", 2);
             String key = pair[0];
             String value = "";
             if(pair.length > 1){ value = URLDecoder.decode(pair[1]); }
@@ -223,6 +236,7 @@ public class Connection implements Runnable{
      */
     protected Connection Response(ActionResponse response) throws IOException {
         if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: INVIO - " + response.status); }
+        //Scrivo gli header nel Buffer di output
         this.output.println("HTTP/1.1 " + response.status + " " + StatusCodes.get(response.status));
         this.output.println("Server: Java HTTP Server");
         this.output.println("Date: " + new Date());
@@ -231,6 +245,7 @@ public class Connection implements Runnable{
         this.output.println();
         this.output.flush();
 
+        //Scrivo il corpo nel Buffer di dati di output
         this.dataOutput.write(response.result.getBytes(), 0, response.length());
         this.dataOutput.flush();
         if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: INVIATA"); }

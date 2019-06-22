@@ -57,12 +57,15 @@ public class Client {
         if(verbose){ System.out.println("[" + new Date() + "][CLIENT][GET][OUT]: " + _url); }
         HttpURLConnection connection;
 
+        //Controllo il protocollo della connessione e genero la relativa connection
         if(_url.getProtocol() == "https"){ connection = (HttpsURLConnection) _url.openConnection(); }
         else{ connection = (HttpURLConnection) _url.openConnection(); }
 
+        //Impsoto il metodo a GET e il follow sui reindirizzamenti
         connection.setRequestMethod("GET");
         connection.setInstanceFollowRedirects(true);
 
+        //Se sono presenti parametri li aggiungo al corpo della chiamata
         if(params != null){
             connection.setDoOutput(true);
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
@@ -73,13 +76,18 @@ public class Client {
 
         //Simulazione di un browser (stranamente richiesta dal server del dataset)
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
+        //Charset accettato per parsare la risposta
         connection.setRequestProperty("Accept-Charset", "UTF-8");
+
+        //Se sono presenti headers li aggiungo in testata alla chimata
         if(headers != null){ for(Map.Entry<String, String> entry : params.entrySet()){ connection.setRequestProperty(entry.getKey(), entry.getValue()); } }
 
+        //Effettuo la chiamata recuperando lo status code
         int status = connection.getResponseCode();
         String response = null;
         if(verbose){ System.out.println("[" + new Date() + "][CLIENT][GET][OUT]: " + status); }
         if(status == 200){
+            //SUCCESSO -> leggo il corpo della risposta
             BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
             StringBuffer content = new StringBuffer();
@@ -87,7 +95,11 @@ public class Client {
             inputBuffer.close();
             response = UString.Escape(content.toString());
         }
-        else{ throw new Exception("StatusCode: " + status); }
+        else{
+            //FALLIMENTO -> langio un errore con lo status code
+            throw new Exception("StatusCode: " + status);
+        }
+        //Chiudo la connessione
         connection.disconnect();
         return response;
     }
@@ -100,6 +112,7 @@ public class Client {
      */
     protected String getParamsString(Map<String, String> params) throws UnsupportedEncodingException {
         String result = "";
+        //Concatenazione: "chiave=valore&"
         for(Map.Entry<String, String> entry  : params.entrySet()){ result += UString.Utf8Encode(entry.getKey()) + "=" + UString.Utf8Encode(entry.getValue()) + "&"; }
         int length = result.length();
         return  length > 0 ? result.substring(0, length - 1) : result;
@@ -111,6 +124,8 @@ public class Client {
      * @throws Exception
      */
     public DtoPackage CollectPackage() throws Exception{
+        //A causa della presenza di caratteri unicode particolari è necessario rimuovere gli \n dalla risposta per
+        //poter parsare correttamente il json
         String requestResult = this.Get(this.baseUrl).replace("\n", "");
         return UObject.fromJSON(requestResult, DtoPackage.class);
     }
@@ -122,6 +137,7 @@ public class Client {
      * @throws Exception
      */
     public List<DtoData> CollectData(DtoPackage dtoPackage) throws Exception{
+        //Cerco nelle informazioni del dataset la risorsa in formato csv
         DtoPackageResource source = null;
         for(DtoPackageResource resource: dtoPackage.result.resources){
             if(resource.format.equalsIgnoreCase("csv")){
@@ -129,9 +145,12 @@ public class Client {
                 break;
             }
         }
+        //Se non ho trovato la risorsa lancio un errore
         if(source == null){ throw new Exception("Impossible to find csv resource"); }
 
+        //Recupero la risorsa csv
         String requestResult = this.Get(source.url);
+        //Parsing della risorsa
         return UCsv.Parse(requestResult, DtoData.class);
     }
 }

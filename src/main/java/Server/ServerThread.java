@@ -64,6 +64,7 @@ public class ServerThread implements Runnable{
             Connection connect = null;
             try{
                 if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION]: CREAZIONE"); }
+                //Genero una connessione in ascolto attendendo un client che si colleghi
                 connect = new Connection(this.socket.accept(), this.dtoPackage, this.dataset).SetVerbose(this.verbose);
             }
             catch (Exception ex){
@@ -72,6 +73,8 @@ public class ServerThread implements Runnable{
             }
 
             if(connect != null){
+                //Se la connessione è stata creata genero un nuovo thread di Connessione e rimetto il server in attesa
+                //di un nuovo client
                 Thread response = new Thread(connect);
                 response.start();
             }

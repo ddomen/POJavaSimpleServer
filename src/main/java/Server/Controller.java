@@ -63,34 +63,37 @@ public class Controller {
      * @return risposta elaborata da scrivere sulla connessione
      */
     public ActionResponse Execute(DtoPackage dtoPackage, List<DtoData> dataset){
+        //Finché il server non ha recuperato i dati torna 503
         if(dtoPackage == null || dataset == null){ return ActionResponse.ServiceUnavailable; }
         Method action = null;
         Class[] arguments = new Class[2];
         arguments[0] = DtoPackage.class;
         arguments[1] = List.class;
+        //Costruisco il nome del metodo da recuperare nel seguente modo: metodoUrl (ad es. GET /package => getPackage)
         String originalActionName = method.toLowerCase() + (this.url.isEmpty() ? "" : (url.substring(0, 1).toUpperCase() + url.substring(1).toLowerCase()));
-        String actionName = this.url.isEmpty() ? "Default" : originalActionName;
+        //Se l'url è vuoto ("/") l'action diventa quella di default (Index)
+        String actionName = this.url.isEmpty() ? "Index" : originalActionName;
+
+        if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONTROLLER][ACTION]: " + actionName + " (" + originalActionName + ")"); }
+        if(this.url.isEmpty()){ return this.Index(dtoPackage, dataset); }
+
         try{ action = this.getClass().getMethod(actionName, arguments); }
         catch(Exception ex){
-            try {
-                actionName = "NotFound";
-                action = this.getClass().getMethod(actionName, arguments);
-            }
-            catch(Exception ex2){
-                System.err.println("[" + new Date() + "][SERVER][CONTROLLER]: IMPOSSIBILE COMPLETARE AZIONE - " + originalActionName);
-                if(this.verbose){ ex2.printStackTrace(); }
-            }
+            //Se non è stata trovata la action si torna 404 - NotFound
+            return this.NotFound(dtoPackage, dataset);
         }
         try {
+            //Esecuzzione della action
             if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONTROLLER][ACTION]: " + actionName + " (" + originalActionName + ")"); }
             this.response = (ActionResponse)action.invoke(this, dtoPackage, dataset);
         }
         catch (Exception ex){
-            this.response = ActionResponse.InternalServerError;
+            //Se la action va in errore si torna errore lato server (500)
             if(this.verbose){
                 System.err.println("[" + new Date() + "][SERVER][CONTROLLER][ACTION]: " + actionName + "(" + originalActionName + ")");
                 ex.printStackTrace();
             }
+            return ActionResponse.InternalServerError;
         }
         return this.response;
     }
@@ -109,7 +112,7 @@ public class Controller {
      * @param dataset dataset
      * @return risposta elaborata da scrivere sulla connessione
      */
-    public ActionResponse Default(DtoPackage dtoPackage, List<DtoData> dataset){
+    public ActionResponse Index(DtoPackage dtoPackage, List<DtoData> dataset){
         String[] apis = new String[]{ "package", "metadata", "data", "stats" };
         String defaultResponse = "<!DOCTYPE html><html><head></head><body><h1>PATHS:</h1><br/>";
         for(String api : apis){ defaultResponse += "<h3><a href=\"" + api + "\">" + api + "</a></h3>"; }
@@ -207,7 +210,7 @@ public class Controller {
             if (result == null) { return ActionResponse.BadRequest; }
             return new ActionResponse(result).Json();
         }
-        catch(IllegalAccessException ex){ return new ActionResponse("Field " + field + " not found!", 400).Html(); }
+        catch(NoSuchFieldException | IllegalAccessException ex){ return new ActionResponse("Field " + field + " not found!", 400).Html(); }
     }
 
     /**

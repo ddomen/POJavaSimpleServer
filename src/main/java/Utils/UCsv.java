@@ -30,11 +30,14 @@ public final class UCsv {
     public static <ReturnType> List<ReturnType> Parse(String csv, Class<ReturnType> _class, String separator) throws InstantiationException, IllegalAccessException{
         List<ReturnType> result = new ArrayList<ReturnType>();
 
+        //Splitto per riga
         List<String> rows = new ArrayList<String>(Arrays.asList(csv.split("[\n\r]")));
+        //La prima riga la uso come intestazione per definire i campi e poi la rimuovo
         List<String> headers = new ArrayList<String>(Arrays.asList(rows.get(0).split(separator)));
         rows.remove(0);
 
         for(String row : rows){
+            //Per ogni riga creo un'instanza della classe e ne setto i campi
             ReturnType current = _class.newInstance();
             List<String> cells = Arrays.asList(row.split(separator));
             int cellSize = cells.size();

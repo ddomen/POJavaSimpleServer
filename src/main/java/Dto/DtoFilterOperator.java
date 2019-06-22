@@ -59,15 +59,25 @@ public abstract class DtoFilterOperator<Type> extends Dto {
     public List<DtoData> Apply(List<DtoData> dataset, java.lang.String property) throws IllegalAccessException{
         List<DtoData> result = new ArrayList<DtoData>();
         for(DtoData data : dataset){
+            //Recupero il valore del campo dell'oggetto
             Type current = UObject.Get(data, property.toUpperCase());
+            //valore uguale $eq (se esiste $eq)?
             if($eq != null && this.NotEqual(current, $eq)) continue;
+            //valore diverso $not (se esiste $not)?
             if($not != null && this.Equal(current, $not)) continue;
+            //valore contenuto in $in (se esiste $in)?
             if($in != null && this.NotContained(current, $in)) continue;
+            //valore non contenuto in $nin (se esiste $nin)?
             if($nin != null && this.Contained(current, $nin)) continue;
+            //valore maggiore $gt (se esiste $gt)?
             if($gt != null && this.LesserEqual(current, $gt)) continue;
+            //valore maggiore uguale $gte (se esiste $gte)?
             if($gte != null && this.Lesser(current, $gte)) continue;
+            //valore minore $lt (se esiste $lt)?
             if($lt != null && this.GreaterEqual(current, $lt)) continue;
+            //valore minore uguale $lte (se esiste $lte)?
             if($lte != null && this.Greater(current, $lte)) continue;
+            //valore compreso fra $bt[0] e $bt[1] (se esiste $bt e $bt ha almeno due elementi)?
             if($bt != null && $bt.size() >= 2 && !this.Between(current, $bt.get(0), $bt.get(1))) continue;
             result.add(data);
         }

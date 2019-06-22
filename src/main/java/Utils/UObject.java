@@ -17,6 +17,10 @@ public final class UObject {
      */
     public static Field GetField(Object object, String property){
         Class<?> _class = object.getClass();
+        //Provo a recuperare il campo per la classe corrente
+        //se non è stato trovato passo a controllare nella classe genitore (parent)
+        //e ripeto il ciclo finché esiste una classe genitoriale.
+        //Se ancora non è stata trovata torno null
         while (_class != null) {
             try {
                 Field field = _class.getDeclaredField(property);
@@ -68,6 +72,7 @@ public final class UObject {
         Field field = UObject.GetField(object, property);
         if(field != null){
             Class<?> type = field.getType();
+            //Se il valore è una stringa provo a parsarla secondo la classe del campo descritta dall'oggetto
             if(value != null && value.getClass() == String.class) { field.set(object, Parse((String)value, type)); }
             else{ field.set(object, value); }
         }
@@ -81,6 +86,7 @@ public final class UObject {
      * @return valore castato (o null se non è possibile castare)
      */
     public static Object Parse(String value, Class<?> _class){
+        //Controllo se è possibile parsare la stringa secondo la classe data
         if(String.class == _class) return value;
         else if(value.length() == 0) return null;
         else if(Boolean.class == _class) return Boolean.parseBoolean(value);

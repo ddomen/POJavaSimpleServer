@@ -51,6 +51,7 @@ public class Server {
     public Server Start(){
         if(this.verbose){ System.out.println("[" + new Date() + "][SERVER]: STARTING"); }
         try{
+            //Genero il ServerThread e lo eseguo su un nuovo thread
             this.runner = new ServerThread(this.port).SetVerbose(this.verbose);
             this.thread = new Thread(this.runner);
             thread.start();

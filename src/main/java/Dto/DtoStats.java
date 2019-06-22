@@ -50,16 +50,23 @@ public class DtoStats extends Dto {
      * @return oggetto di statistiche
      * @throws IllegalAccessException
      */
-    public static DtoStats Calculate(String field, List<DtoData> dataset) throws IllegalAccessException{
+    public static DtoStats Calculate(String field, List<DtoData> dataset) throws IllegalAccessException, NoSuchFieldException{
+        //Creo l'oggetto di statistica e la lista di valori trovati per il campo
         DtoStats result = new DtoStats();
         result.field = field;
         List<Double> values = new ArrayList<Double>();
 
+        //Controllo che un dato del dataset possa contenere il campo
+        //Se lo continene setto il tipo per la statistica
+        //Altrimenti lancia il relativo errore
+        result.type = DtoData.class.getField(field).getType().getName().toLowerCase().replace("java.lang.", "");
+
         for(DtoData data : dataset){
             Class type = data.GetType(result.field);
             Object _value = data.Get(result.field);
-            if(result.type == null){ result.type = type.getName().toLowerCase().replace("java.lang.", ""); }
+
             if(_value != null && (type == Long.class || type == Integer.class || type == Double.class)){
+                //Se il valore è numerico calcolo somma, media, minimo e massimo, ed aggiungo 1 al contatore
                 Double value = null;
                 if(type == Long.class){ value = ((Long)_value).doubleValue(); }
                 else if(type == Integer.class){ value = ((Integer)_value).doubleValue(); }
@@ -78,18 +85,22 @@ public class DtoStats extends Dto {
                 values.add(value);
             }
             else if(_value != null){
+                //Se il valore non è numerico ma non nullo aggiungo 1 al contatore
                 if(result.count == null){ result.count = 0L; }
                 result.count++;
             }
             else if(_value == null) {
+                //Se il valore è nullo aggiungo 1 al contatore elementi vuoti
                 if(result.empty == null){ result.empty = 0L; }
                 result.empty++;
             }
         }
 
-        if(result.sum != null && result.count != null){ result.average = result.sum / result.count; }
+        //Se somma e conteggio sono definiti calcolo la media
+        if(result.sum != null && result.count != null && result.count > 0){ result.average = result.sum / result.count; }
 
-        if(result.average != null && result.count != null){
+        //Se media e conteggio sono definiti calcolo la deviazione standard
+        if(result.average != null && result.count != null && result.count > 0){
             Double sum = 0D;
             for(Double value : values){ sum += Math.pow(value - result.average, 2); }
             result.std = Math.sqrt(sum / result.count);
