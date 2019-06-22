@@ -5,6 +5,9 @@ import Dto.*;
 import Server.*;
 import Utils.UObject;
 
+/**
+ * Classe di programma per l'avvio
+ */
 public class Program {
 
     /**

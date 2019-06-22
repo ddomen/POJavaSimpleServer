@@ -147,11 +147,11 @@ public class Connection implements Runnable{
         this.output.println("Server: Java HTTP Server");
         this.output.println("Date: " + new Date());
         this.output.println("Content-type: " + response.contentType);
-        this.output.println("Content-length: " + response.length);
+        this.output.println("Content-length: " + response.length());
         this.output.println();
         this.output.flush();
 
-        this.dataOutput.write(response.result.getBytes(), 0, response.length);
+        this.dataOutput.write(response.result.getBytes(), 0, response.length());
         this.dataOutput.flush();
         if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: INVIATA"); }
         return this;
