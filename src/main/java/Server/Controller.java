@@ -118,7 +118,11 @@ public class Controller {
      * @return risposta elaborata da scrivere sulla connessione
      */
     public ActionResponse Index(DtoPackage dtoPackage, List<DtoData> dataset){
-        String[] apis = new String[]{ "package", "metadata", "data", "stats?field=id" };
+        String[] apis = new String[]{
+                "package", "metadata", "data", "stats?field=id",
+                "data?filter={%22id%22:5}", "data?filter={%22id%22:{%22$in%22:[3,5,7,9]}}",
+                "stats?field=id&filter={%22id%22:{%22$in%22:[3,5,7,9]}}"
+        };
         String defaultResponse = "<!DOCTYPE html><html><head></head><body><h1>PATHS:</h1><br/>";
         for(String api : apis){ defaultResponse += "<h3><a href=\"" + api + "\">" + api + "</a></h3>"; }
         defaultResponse += "</body></html>";
