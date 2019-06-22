@@ -11,7 +11,7 @@ import Utils.UObject;
  * @param <Type> Tipo di filtro concatenabile su operazioni or ed and
  * @param <Interface> Interfaccia dei dati filtrabili
  */
-public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
+public abstract class DtoFilter<Type extends IFilter<Interface>, Interface> extends Dto implements IFilter<Interface>{
 
     /**
      * Lista per la concatenazione dei filtri in logica OR
