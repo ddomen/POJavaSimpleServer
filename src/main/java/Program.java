@@ -23,7 +23,7 @@ public class Program {
 
         //Registro i Deserializer per parsare i json dei filtri
         UObject.RegisterJsonDeserializer(DtoFilter.Data.class, DtoFilter.Deserializer);
-        UObject.RegisterJsonDeserializer(DtoFilter.Stats.class, DtoFilter.Deserializer);
+        //UObject.RegisterJsonDeserializer(DtoFilter.Stats.class, DtoFilter.Deserializer); //(inusato)
 
         //Recupero il dataset e le informazioni con un client https
         Client cli = new Client("https://www.dati.gov.it/api/3/action/package_show?id=32d1d774-f89d-4fdd-ba2a-1466701c4024").SetVerbose(verbose);

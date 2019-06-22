@@ -126,7 +126,7 @@ public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
     /**
      * Deserializzatore customizzato per convertire un json in un DtoFilter
      */
-    public static JsonDeserializer<DtoFilter> Deserializer = new JsonDeserializer<DtoFilter>() {
+    public static JsonDeserializer<Data> Deserializer = new JsonDeserializer<Data>() {
         @Override
         public Data deserialize(JsonElement jsonElement, java.lang.reflect.Type jType, JsonDeserializationContext context) throws JsonParseException {
             //Genero un nuovo filtro
