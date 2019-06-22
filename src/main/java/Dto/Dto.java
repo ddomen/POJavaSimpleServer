@@ -2,9 +2,9 @@ package Dto;
 import Utils.UObject;
 
 /**
- * Data Transfert Object - Modello di trasferimento dati all'interno dell'applicazione
+ * Data Transfert Object - Modello astratto di trasferimento dati all'interno dell'applicazione
  */
-public class Dto {
+public abstract class Dto {
 
     /**
      * Recupera la classe di una proprietà dell'oggetto
