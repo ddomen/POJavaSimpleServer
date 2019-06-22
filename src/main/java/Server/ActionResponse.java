@@ -59,6 +59,13 @@ public class ActionResponse {
      */
     public ActionResponse SetResult(Object result){ return this.SetResult(UObject.toJSON(result)); }
 
+
+    /**
+     * Recupera il corpo del messaggio
+     * @return corpo del messaggio
+     */
+    public byte[] GetResultBytes(){ return this.result.getBytes(); }
+
     /**
      * Setta lo stato del messaggio
      * @param status stato del messaggio
@@ -66,12 +73,26 @@ public class ActionResponse {
      */
     public ActionResponse SetStatus(int status){ this.status = status; return this;}
 
+
+    /**
+     * Recupera lo stato del messaggio
+     * @return status
+     */
+    public int GetStatus(){ return this.status; }
+
     /**
      * Setta l'header content type del messaggio
      * @param contentType content type del messaggio
      * @return oggetto this per la concatenzaione (method chaining)
      */
     public ActionResponse SetContentType(String contentType){ this.contentType = contentType; return this;}
+
+
+    /**
+     * Recupera il content type della risposta
+     * @return content type della risposta
+     */
+    public String GetContentType(){ return this.contentType; }
 
     /**
      * Setta il content type dell'header del messaggio in application/json

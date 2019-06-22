@@ -237,16 +237,16 @@ public class Connection implements Runnable{
     protected Connection Response(ActionResponse response) throws IOException {
         if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: INVIO - " + response.status); }
         //Scrivo gli header nel Buffer di output
-        this.output.println("HTTP/1.1 " + response.status + " " + StatusCodes.get(response.status));
+        this.output.println("HTTP/1.1 " + response.GetStatus() + " " + StatusCodes.get(response.GetStatus()));
         this.output.println("Server: Java HTTP Server");
         this.output.println("Date: " + new Date());
-        this.output.println("Content-type: " + response.contentType);
+        this.output.println("Content-type: " + response.GetContentType());
         this.output.println("Content-length: " + response.length());
         this.output.println();
         this.output.flush();
 
         //Scrivo il corpo nel Buffer di dati di output
-        this.dataOutput.write(response.result.getBytes(), 0, response.length());
+        this.dataOutput.write(response.GetResultBytes(), 0, response.length());
         this.dataOutput.flush();
         if(this.verbose){ System.out.println("[" + new Date() + "][SERVER][CONNECTION][" + ID + "]: INVIATA"); }
         return this;
