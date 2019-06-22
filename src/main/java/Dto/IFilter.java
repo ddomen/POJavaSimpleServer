@@ -3,7 +3,7 @@ package Dto;
 import java.util.List;
 
 /**
- * Interfaccia per implementazione di un filtro
+ * Interfaccia per implementazione di un filtro. Generalizza la possibilità di applicazione di un filtro su un dataset
  * @param <Interface> Tipologia di dato da filtrare
  */
 public interface IFilter<Interface> {
