@@ -33,7 +33,9 @@ Il ***Server*** si mette in ascolto alla porta fornita. Finché il ***Client*** 
 
 > Service Unavailable - 503
 
-Una volta che i dati sono stati recuperti, il server esporrà le seguenti *API*:
+Una volta che i dati sono stati recuperti, in console verrà scritto `[Data][SERVER]: PRONTO`.
+
+Da quel momento il server esporrà le seguenti *API*:
 
 * `/` - Pagina di Index con alcuni collegamenti veloci di esempio
 * `/package` - json recuperato dal link fornito per reperire le informazioni sul **dataset**
@@ -154,6 +156,9 @@ Il filtro viene chiaramente applicato sul **dataset** prima del calcolo delle st
 ***Nota:*** Qualora l'alias fornito non sia presente nel **dataset** verrà restituita la risposta:
 > Field { field } not found! - Bad Request - 400
 
+
+## Modalità Verbose
+Avviando il programma in modalità verbose sarà possibile visualizzare una maggiore quantità di log in console descrivendo maggiormente le azioni intraprese. Verranno inclusi nei log di errore anche i loro stacktrace.
 
 ## UML
 Sono riportate in UML le sole classi con almeno due collegamenti ad altre classi e le classi statiche di utilità.
