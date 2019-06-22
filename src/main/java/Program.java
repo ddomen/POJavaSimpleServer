@@ -31,6 +31,7 @@ public class Program {
             return;
         }
         String verboseProp = prop.getProperty("verbose", "false");
+        String portProp = prop.getProperty("port", "80");
 
         boolean verbose = verboseProp.equalsIgnoreCase("true") || verboseProp.equalsIgnoreCase("1");
         //Controllo se ci sono argomenti, nel caso il primo è "dev" allora setto la modalità del programma a verbose
@@ -49,7 +50,11 @@ public class Program {
         System.out.println("[" + new Date() + "][SERVER]: CREAZIONE");
 
         //Istanzio e lancio il server - finchè non saranno recuperati i dati dal client risponderà con 503
-        Server svr = new Server().SetVerbose(verbose).Start();
+        int port = 80;
+        try{ port = Integer.parseInt(portProp); }
+        catch (Exception ex){ port = 80; }
+        if(port <= 0){ port = 80; }
+        Server svr = new Server(port).SetVerbose(verbose).Start();
 
         DtoPackage dtoPackage = null;
         List<DtoData> dataset = null;
