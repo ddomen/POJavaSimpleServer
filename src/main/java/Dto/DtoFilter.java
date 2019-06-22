@@ -1,19 +1,33 @@
 package Dto;
 
-import Utils.UObject;
+import java.lang.reflect.*;
+import java.util.*;
 import com.google.gson.*;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import Utils.UObject;
 
+/**
+ * Classe astratta per la mappatura del filtro su dataset
+ * @param <Type> Tipo di filtro concatenabile su operazioni or ed and
+ * @param <Interface> Interfaccia dei dati filtrabili
+ */
 public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
 
+    /**
+     * Lista per la concatenazione dei filtri in logica OR
+     */
     public List<Type> $or;
+    /**
+     * Lista per la concatenazione dei filtri in logica AND
+     */
     public List<Type> $and;
 
+    /**
+     * Applica il filtro ad un detrminato dataset
+     * @param dataset dataset da filtrare
+     * @return dataset filtrato
+     * @throws IllegalAccessException
+     */
     public List<Interface> Apply(List<Interface> dataset) throws IllegalAccessException{
         List<Interface> result = new ArrayList<Interface>();
         result.addAll(dataset);
@@ -36,12 +50,20 @@ public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
         return result;
     }
 
+    /**
+     * Controlla se un campo del filtro corrente sia applicabile come filtro
+     * @param field campo del filtro
+     * @return true se applicabile
+     */
     protected boolean ApplicableField(Field field){
         String property = field.getName();
         int modifiers = field.getModifiers();
         return !(property.startsWith("$") || Modifier.isStatic(modifiers)) && Modifier.isPublic(modifiers);
     }
 
+    /**
+     * Mappatura del filtro sui dati del dataset
+     */
     public static class Data extends DtoFilter<Data, DtoData>{
         public DtoFilterOperator.Long id;
         public DtoFilterOperator.Long codice_asl;
@@ -75,6 +97,9 @@ public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
 
     }
 
+    /**
+     * Mappatura del filtro sulle statistiche del dataset
+     */
     public static class Stats extends DtoFilter<Stats, DtoStats> {
         public DtoFilterOperator.Long count;
 
@@ -87,6 +112,9 @@ public abstract class DtoFilter<Type extends DtoFilter, Interface> extends Dto{
         public DtoFilterOperator.String field;
     }
 
+    /**
+     * Deserializzatore customizzato per convertire un json in un DtoFilter
+     */
     public static JsonDeserializer<DtoFilter> Deserializer = new JsonDeserializer<DtoFilter>() {
         @Override
         public Data deserialize(JsonElement jsonElement, java.lang.reflect.Type jType, JsonDeserializationContext context) throws JsonParseException {
