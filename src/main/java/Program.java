@@ -5,8 +5,11 @@ import Dto.DtoPackage;
 import Server.Server;
 import Utils.UObject;
 
+import java.io.FileInputStream;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Classe di programma per l'avvio
@@ -22,14 +25,26 @@ public class Program {
         //Controllo se ci sono argomenti, nel caso il primo è "dev" allora setto la modalità del programma a verbose
         if(args.length > 0) { verbose = args[0].equalsIgnoreCase("dev"); }
 
-        if(verbose){ System.out.println("[" + new Date() + "][PROGRAM]: STARTED WITH VERBOSE MODE") ; }
+        if(verbose){ System.out.println("[" + new Date() + "][PROGRAM]: AVVIATO IN MODALITA' VERBOSE") ; }
 
         //Registro i Deserializer per parsare i json dei filtri
         UObject.RegisterJsonDeserializer(DtoFilter.Data.class, DtoFilter.Deserializer);
         //UObject.RegisterJsonDeserializer(DtoFilter.Stats.class, DtoFilter.Deserializer); //(inusato)
 
+        Properties prop = new Properties();
+        try {
+            //Recupero le informazioni dal file di configurazione
+            FileInputStream ip = new FileInputStream("./config.properties");
+            prop.load(ip);
+        }
+        catch(Exception ex){
+            System.err.println("[" + new Date() +  "][PROGRAM]: IMPOSSIBILE TROVARE FILE DI CONFIGURAZIONE");
+            return;
+        }
         //Recupero il dataset e le informazioni con un client https
-        Client cli = new Client("https://www.dati.gov.it/api/3/action/package_show?id=32d1d774-f89d-4fdd-ba2a-1466701c4024").SetVerbose(verbose);
+        String baseUrl = prop.getProperty("baseUrl");
+        Client cli = new Client(baseUrl).SetVerbose(verbose);
+        if(verbose){ System.out.println("[" + new Date() + "][PROGRAM][BASEURL]: " + baseUrl); }
         System.out.println("[" + new Date() + "][SERVER]: CREAZIONE");
 
         //Istanzio e lancio il server - finchè non saranno recuperati i dati dal client risponderà con 503
