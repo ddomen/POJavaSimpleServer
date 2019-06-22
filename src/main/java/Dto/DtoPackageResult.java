@@ -1,6 +1,7 @@
 package Dto;
 
-import java.util.*;
+import java.util.List;
+import java.util.Date;
 
 /**
  * Dto per la mappatura delle informazioni del dataset -> campo result

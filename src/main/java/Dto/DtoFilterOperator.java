@@ -1,8 +1,9 @@
 package Dto;
 
-import java.util.*;
-
 import Utils.UObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe astratta per la modellazione degli operatori del filtro

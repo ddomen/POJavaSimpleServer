@@ -1,9 +1,12 @@
 package Server;
 
-import java.util.*;
-import java.io.IOException;
+import Dto.DtoData;
+import Dto.DtoPackage;
 
-import Dto.*;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+
 
 /**
  * Classe per la generazione di un Server

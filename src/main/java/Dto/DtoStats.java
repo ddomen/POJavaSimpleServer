@@ -1,6 +1,7 @@
 package Dto;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Dto per la mappatura ed il calcolo delle statistiche sul dataset

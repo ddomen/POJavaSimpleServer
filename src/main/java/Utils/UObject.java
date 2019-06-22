@@ -1,8 +1,11 @@
 package Utils;
 
-import com.google.gson.*;
-import java.util.*;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Classe di utilità nella gestione degli oggetti

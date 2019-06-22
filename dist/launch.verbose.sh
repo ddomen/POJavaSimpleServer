@@ -1,0 +1,1 @@
+java -jar objprog2019.jar dev

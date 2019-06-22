@@ -1,10 +1,13 @@
 package Dto;
 
-import java.lang.reflect.*;
-import java.util.*;
-import com.google.gson.*;
 
 import Utils.UObject;
+import com.google.gson.*;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe astratta per la mappatura del filtro su dataset
