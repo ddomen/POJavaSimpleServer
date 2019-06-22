@@ -4,10 +4,8 @@ import Dto.DtoFilter;
 import Dto.DtoPackage;
 import Server.Server;
 import Utils.UObject;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.io.FileInputStream;
-import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -32,9 +30,9 @@ public class Program {
             System.err.println("[" + new Date() +  "][PROGRAM]: IMPOSSIBILE TROVARE FILE DI CONFIGURAZIONE - USCITA");
             return;
         }
-        String verboseProp = prop.getProperty("verbose", "false").toLowerCase();
+        String verboseProp = prop.getProperty("verbose", "false");
 
-        boolean verbose = verboseProp == "true" || verboseProp == "1";
+        boolean verbose = verboseProp.equalsIgnoreCase("true") || verboseProp.equalsIgnoreCase("1");
         //Controllo se ci sono argomenti, nel caso il primo è "dev" allora setto la modalità del programma a verbose
         if(args.length > 0) { verbose = args[0].equalsIgnoreCase("dev"); }
 
