@@ -1,19 +1,55 @@
 package Dto;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
+/**
+ * Dto per la mappatura ed il calcolo delle statistiche sul dataset
+ */
 public class DtoStats extends Dto {
+    /**
+     * Campo analizzato nel dataset
+     */
     public String field = null;
+    /**
+     * Classe del campo analizzato
+     */
     public String type = null;
+    /**
+     * Media (presente solo in caso di campi numerici)
+     */
     public Double average = null;
+    /**
+     * Minimo (presente solo in caso di campi numerici)
+     */
     public Double min = null;
+    /**
+     * Massimo (presente solo in caso di campi numerici)
+     */
     public Double max = null;
+    /**
+     * Deviazione Standard (presente solo in caso di campi numerici)
+     */
     public Double std = null;
+    /**
+     * Somma (presente solo in caso di campi numerici)
+     */
     public Double sum = null;
+    /**
+     * Numero di campioni
+     */
     public Long count = null;
+    /**
+     * Numero di campioni nulli
+     */
     public Long empty = null;
 
+    /**
+     * Calcola le statistiche su un campo del dataset
+     * @param field campo da analizzare
+     * @param dataset dataset da analizzare
+     * @return oggetto di statistiche
+     * @throws IllegalAccessException
+     */
     public static DtoStats Calculate(String field, List<DtoData> dataset) throws IllegalAccessException{
         DtoStats result = new DtoStats();
         result.field = field;
@@ -40,6 +76,10 @@ public class DtoStats extends Dto {
                 result.max = Math.max(result.max, value);
                 result.count++;
                 values.add(value);
+            }
+            else if(_value != null){
+                if(result.count == null){ result.count = 0L; }
+                result.count++;
             }
             else if(_value == null) {
                 if(result.empty == null){ result.empty = 0L; }
