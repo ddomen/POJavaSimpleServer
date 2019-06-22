@@ -9,6 +9,12 @@ Il programma all'avvio esegue tre operazioni:
 2. Creazione del ***Client*** per il recupero del **dataset**
 3. Creazione del ***Server*** per l'esposizione delle api
 
+Per lanciare il programma è possibile utilizzare il pacchetto jar `dist/objprog2019.jar`.
+
+Sono stati preparati i file `launch.bat`, `launch.verbose.bat`, `launch.sh` e `launch.verbose.sh` per poter lanciare velocemente il programma.
+
+***Nota:*** per poter lanciare correttamente il programma (con la relativa configurazione) è necessario posizionarsi all'interno della cartella dist.
+
 ### Configurazione
 Nel `config.properties` sarà possibile definire le seguenti configurazioni:
 * `baseUrl`: l'url dal quale reperire le informazioni sul **dataset**
