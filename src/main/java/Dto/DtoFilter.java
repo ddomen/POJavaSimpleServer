@@ -8,19 +8,19 @@ import Utils.UObject;
 
 /**
  * Classe astratta per la mappatura del filtro su dataset
- * @param <Type> Tipo di filtro concatenabile su operazioni or ed and
- * @param <Interface> Interfaccia dei dati filtrabili
+ * @param <FilterType> Tipo di filtro concatenabile su operazioni or ed and
+ * @param <DataType> Interfaccia dei dati filtrabili
  */
-public abstract class DtoFilter<Type extends IFilter<Interface>, Interface> extends Dto implements IFilter<Interface>{
+public abstract class DtoFilter<FilterType extends IFilter<DataType>, DataType> extends Dto implements IFilter<DataType>{
 
     /**
      * Lista per la concatenazione dei filtri in logica OR
      */
-    public List<Type> $or;
+    public List<FilterType> $or;
     /**
      * Lista per la concatenazione dei filtri in logica AND
      */
-    public List<Type> $and;
+    public List<FilterType> $and;
 
     /**
      * Applica il filtro ad un detrminato dataset
@@ -28,9 +28,9 @@ public abstract class DtoFilter<Type extends IFilter<Interface>, Interface> exte
      * @return dataset filtrato
      * @throws IllegalAccessException
      */
-    public List<Interface> Apply(List<Interface> dataset) throws IllegalAccessException{
+    public List<DataType> Apply(List<DataType> dataset) throws IllegalAccessException{
         //Copio la lista per lasciare intatta quella di input
-        List<Interface> result = new ArrayList<Interface>();
+        List<DataType> result = new ArrayList<DataType>();
         result.addAll(dataset);
         //Recupero i campi del filtro
         Field[] fields = this.getClass().getFields();
@@ -45,16 +45,16 @@ public abstract class DtoFilter<Type extends IFilter<Interface>, Interface> exte
 
         if($or != null){
             //Se è presente il campo $or applico ogni suo filtro al dataset risultante
-            List<Interface> orResult = new ArrayList<Interface>();
-            for(Type or : $or){ orResult.addAll(or.Apply(result)); }
+            List<DataType> orResult = new ArrayList<DataType>();
+            for(FilterType or : $or){ orResult.addAll(or.Apply(result)); }
 
             //Ripulisco il dataset risultante e riaggiungo gli elementi unici recuperati dalla lista di filtri in or
             result.clear();
-            for(Interface r : orResult){ if(!result.contains(r)){ result.add(r); } }
+            for(DataType r : orResult){ if(!result.contains(r)){ result.add(r); } }
         }
         if($and != null){
             //Essendo la logica in AND applico a catena ogni filtro presente nel campo $and
-            for(Type and : $and){ result = and.Apply(result); }
+            for(FilterType and : $and){ result = and.Apply(result); }
         }
 
         return result;

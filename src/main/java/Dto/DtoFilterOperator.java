@@ -1,52 +1,51 @@
 package Dto;
 
-import com.google.gson.*;
 import java.util.*;
 
 import Utils.UObject;
 
 /**
  * Classe astratta per la modellazione degli operatori del filtro
- * @param <Type> Classe del dato per cui il filtro è applicabile
+ * @param <DataType> Classe del dato per cui il filtro è applicabile
  */
-public abstract class DtoFilterOperator<Type> extends Dto {
+public abstract class DtoFilterOperator<DataType> extends Dto {
     /**
      * dato diverso da $not
      */
-    public Type $not;
+    public DataType $not;
     /**
      * dato uguale a $eq
      */
-    public Type $eq;
+    public DataType $eq;
     /**
      * dato contenuto in $in
      */
-    public List<Type> $in;
+    public List<DataType> $in;
     /**
      * dato non contenuto in $nin
      */
-    public List<Type> $nin;
+    public List<DataType> $nin;
 
     /**
      * dato maggiore di $gt
      */
-    public Type $gt;
+    public DataType $gt;
     /**
      * dato maggiore o uguale di $gte
      */
-    public Type $gte;
+    public DataType $gte;
     /**
      * dato minore di $lt
      */
-    public Type $lt;
+    public DataType $lt;
     /**
      * dato minore o uguale di $lte
      */
-    public Type $lte;
+    public DataType $lte;
     /**
      * dato compreso fra $bt[0] e $bt[1] ($bt[0] <= dato <= $bt[1])
      */
-    public List<Type> $bt;
+    public List<DataType> $bt;
 
 
     /**
@@ -60,7 +59,7 @@ public abstract class DtoFilterOperator<Type> extends Dto {
         List<DtoData> result = new ArrayList<DtoData>();
         for(DtoData data : dataset){
             //Recupero il valore del campo dell'oggetto
-            Type current = UObject.Get(data, property.toUpperCase());
+            DataType current = UObject.Get(data, property.toUpperCase());
             //valore uguale $eq (se esiste $eq)?
             if($eq != null && this.NotEqual(current, $eq)) continue;
             //valore diverso $not (se esiste $not)?
@@ -90,14 +89,14 @@ public abstract class DtoFilterOperator<Type> extends Dto {
      * @param right parte destra dell'ugualianza
      * @return true se uguali
      */
-    protected abstract boolean Equal(Type left, Type right);
+    protected abstract boolean Equal(DataType left, DataType right);
     /**
      * Definizione astratta di ordine per l'operatore
      * @param left parte sinistra dell'ordine
      * @param right parte destra dell'ordine
      * @return true se la parte sinistra è maggiore della destra
      */
-    protected abstract boolean Greater(Type left, Type right);
+    protected abstract boolean Greater(DataType left, DataType right);
 
     /**
      * Funzione opposta all'ugualianza per l'operatore
@@ -105,28 +104,28 @@ public abstract class DtoFilterOperator<Type> extends Dto {
      * @param right parte destra dell'ordine
      * @return true se non uguali
      */
-    protected boolean NotEqual(Type left, Type right){ return !this.Equal(left, right); }
+    protected boolean NotEqual(DataType left, DataType right){ return !this.Equal(left, right); }
     /**
      * Funzione di ordine e ugualianza per l'operatore
      * @param left parte sinistra dell'ordine
      * @param right parte destra dell'ordine
      * @return true se la parte sinistra è maggiore della destra o se le parti sono uguali
      */
-    protected boolean GreaterEqual(Type left, Type right){ return this.Greater(left, right) || this.Equal(left, right); }
+    protected boolean GreaterEqual(DataType left, DataType right){ return this.Greater(left, right) || this.Equal(left, right); }
     /**
      * Funzione di ordine inverso ed ugualianza per l'operatore
      * @param left parte sinistra dell'ordine
      * @param right parte destra dell'ordine
      * @return true se la parte sinistra non è maggiore della destra
      */
-    protected boolean LesserEqual(Type left, Type right){ return !this.Greater(left, right); }
+    protected boolean LesserEqual(DataType left, DataType right){ return !this.Greater(left, right); }
     /**
      * Funzione di ordine inverso per l'operatore
      * @param left parte sinistra dell'ordine
      * @param right parte destra dell'ordine
      * @return true se la parte sinistra non è maggiore o uguale della destra
      */
-    protected boolean Lesser(Type left, Type right){ return !this.GreaterEqual(left, right); }
+    protected boolean Lesser(DataType left, DataType right){ return !this.GreaterEqual(left, right); }
     /**
      * Funzione per valutare se una parte è compresa fra altre due per l'operatore
      * @param left parte sinistra
@@ -134,7 +133,7 @@ public abstract class DtoFilterOperator<Type> extends Dto {
      * @param max parte massima (left <= max)
      * @return true se la parte sinistra è compresa fra le parti min e max (min <= left <= max)
      */
-    protected boolean Between(Type left, Type min, Type max){ return this.GreaterEqual(left, min) && this.LesserEqual(left, max); }
+    protected boolean Between(DataType left, DataType min, DataType max){ return this.GreaterEqual(left, min) && this.LesserEqual(left, max); }
 
     /**
      * Funzione per valutare se una parte è membra di un inseme
@@ -142,14 +141,14 @@ public abstract class DtoFilterOperator<Type> extends Dto {
      * @param array insieme di controllo
      * @return true se esiste un elemento dell'insieme di controllo è uguale al membro di ricerca
      */
-    protected boolean Contained(Type member, List<Type> array){ for(Type element : array){ if(this.Equal(element, member)){ return true; } } return false; }
+    protected boolean Contained(DataType member, List<DataType> array){ for(DataType element : array){ if(this.Equal(element, member)){ return true; } } return false; }
     /**
      * Funzione per valutare se una parte non è membra di un inseme
      * @param member parte membra
      * @param array insieme di controllo
      * @return false se esiste un elemento dell'insieme di controllo è uguale al membro di ricerca
      */
-    protected boolean NotContained(Type member, List<Type> array){ return !this.Contained(member, array); }
+    protected boolean NotContained(DataType member, List<DataType> array){ return !this.Contained(member, array); }
 
     /**
      * Preset per operatori di filtro su dati di tipo Long
