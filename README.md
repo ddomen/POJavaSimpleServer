@@ -39,7 +39,7 @@ Le *API* sono interrogabili tramite chiamate http *GET* o *POST*. In entrambi i 
 
 ### Metadata
 La chiamata `/metadata` restituisce un array di oggetti di questo tipo:
-```json
+```
 [
     {
         "alias": alias utilizzabile,
@@ -69,7 +69,7 @@ Gli alias dei parametri vengono sempre valutati in modo *case-insensitive*.
 Il parametro `filter` passato alle chiamate `/data?filter` e `/stats?field&filter` può essere composto in questo modo:
 
 *(valore = valore assegnato al json, dato = valore dell'elemento del dataset)*
-```json
+```
 {
     "filter": {
         "alias_del_parametro": {
@@ -117,7 +117,7 @@ La valutazione del filtro avviene in questo ordine di precedenza:
 
 ### Statistiche
 Le statistiche che è possibile recuperare tramite la chiamata `/stats?field&filter` sono nel seguente formato:
-```json
+```
 === JSON ASSOCIATO A CAMPI NUMERICI ===
 {
     "field": alias richiesto,
