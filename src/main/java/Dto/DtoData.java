@@ -1,5 +1,8 @@
 package Dto;
 
+/**
+ * Dto per la mappatura del dataset
+ */
 public class DtoData extends Dto {
     public Long ID;
     public Long CODICE_ASL;
