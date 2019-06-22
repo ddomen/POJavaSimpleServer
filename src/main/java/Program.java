@@ -4,6 +4,7 @@ import Dto.DtoFilter;
 import Dto.DtoPackage;
 import Server.Server;
 import Utils.UObject;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.io.FileInputStream;
 import java.nio.file.Paths;
@@ -21,7 +22,19 @@ public class Program {
      * @param args argomenti passati al programma - se viene passato "dev" come primo argomento il programma verrà eseguito in modalità verbose
      */
     public static void main(String[] args){
-        boolean verbose = false;
+        Properties prop = new Properties();
+        try {
+            //Recupero le informazioni dal file di configurazione
+            FileInputStream ip = new FileInputStream("./config.properties");
+            prop.load(ip);
+        }
+        catch(Exception ex){
+            System.err.println("[" + new Date() +  "][PROGRAM]: IMPOSSIBILE TROVARE FILE DI CONFIGURAZIONE - USCITA");
+            return;
+        }
+        String verboseProp = prop.getProperty("verbose", "false").toLowerCase();
+
+        boolean verbose = verboseProp == "true" || verboseProp == "1";
         //Controllo se ci sono argomenti, nel caso il primo è "dev" allora setto la modalità del programma a verbose
         if(args.length > 0) { verbose = args[0].equalsIgnoreCase("dev"); }
 
@@ -31,16 +44,6 @@ public class Program {
         UObject.RegisterJsonDeserializer(DtoFilter.Data.class, DtoFilter.Deserializer);
         //UObject.RegisterJsonDeserializer(DtoFilter.Stats.class, DtoFilter.Deserializer); //(inusato)
 
-        Properties prop = new Properties();
-        try {
-            //Recupero le informazioni dal file di configurazione
-            FileInputStream ip = new FileInputStream("./config.properties");
-            prop.load(ip);
-        }
-        catch(Exception ex){
-            System.err.println("[" + new Date() +  "][PROGRAM]: IMPOSSIBILE TROVARE FILE DI CONFIGURAZIONE");
-            return;
-        }
         //Recupero il dataset e le informazioni con un client https
         String baseUrl = prop.getProperty("baseUrl");
         Client cli = new Client(baseUrl).SetVerbose(verbose);
