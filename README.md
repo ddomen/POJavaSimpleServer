@@ -2,6 +2,8 @@
 
 ## **Domenichelli Daniele - UNIVPM s1067315**
 
+[JavaDocs](docs/index.html)
+
 ## Progamma
 
 Il programma all'avvio esegue tre operazioni:
